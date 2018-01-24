@@ -13,25 +13,32 @@
 #include <vector>
 #include <array>
 
+// These functions are used to display global source file variables
+void disp_vert(const int&);
+void disp_outvrts();
+void disp_extprbs();
+
+
 namespace SSE
 {
   class CONFIG
   {
     private:
       
-      int     _ns;                      // number of sites in lattice
-      int     _nb;                      // number of bonds in lattice
-      int     _xo;                      // current expansion order of lattice
-      int     _no;                      // current number of operators in lattice
-      double  _bt;                      // beta in units of inverse Boltzmann's constant
-      double  _df;                      // single ion anisotropy term
-      double  _ep;                      // small parameter to add to weights
+      int     _ns;                    // number of sites in lattice
+      int     _nb;                    // number of bonds in lattice
+      int     _xo;                    // current expansion order of lattice
+      int     _no;                    // current number of operators in lattice
+      double  _bt;                    // inverse temperature in units of k_b
+      double  _df;                    // single ion anisotropy term
+      double  _ep;                    // small parameter to add to weights
+      bool    _bc;                    // boundary conditions, PBC=true
 
-      int*                _spins;       // contains spins on each bond site
-      int*                _sites;       // contains structure of lattice
-      std::vector<short>  _oplst;       // bonds on which operators act
-      std::vector<char>   _vtlst;       // list of vertex types
-      double              _vwgts[17];   // contains vertex weights needed for updates
+      int*                _spins;     // contains spins on each bond site
+      int*                _sites[2];  // contains structure of lattice
+      std::vector<int>    _oplst;     // bonds on which operators act
+      std::vector<int>    _vtlst;     // list of vertex types
+      double              _vwgts[17]; // vertex weights needed for updates
 
 
       // function determines the probabily index given an input leg, an input
@@ -45,8 +52,10 @@ namespace SSE
       // ideally due to number of function calls. If an illegal vertex is
       // accessed an id of 0 is return which is likely cause a seg fault if not
       // handled correctly.
-      int _vrtid(const int& s1, const int& s2, const int& s3) const
+      int _vrtid(const int (&spins)[4]) const
       {
+        int s1 = spins[0], s2 = spins[1], s3 = spins[2];
+
         if     ((s1 == 0) && (s2 == 0) && (s3 == 0)) return 1;
         else if((s1 == 1) && (s2 == 0) && (s3 == 1)) return 2;
         else if((s1 ==-1) && (s2 == 0) && (s3 ==-1)) return 3;
@@ -67,17 +76,21 @@ namespace SSE
         else                                         return 0;
       }     
 
-      // calculate the vertex weight for use in the updates
-      void _calcwgts();
+      // calculate the transition probabilities for the update.
+      void _calcprobs();
       
     public:
  
-      CONFIG(const int&, const int&, const double&, const double&, 
-             const double&);
+      CONFIG(const int&,      // system size
+             const double&,   // temperature
+             const double&,   // D-field strength
+             const double&,   // value of epsilon
+             const bool&      // true for periodic boudary conditions
+            );
       
-      void expo_update();   // expansion order update
-      void diag_update();   // diagonal operator update
-      void loop_update();   // directed loop update
+      void expo_update();     // expansion order update
+      void diag_update();     // diagonal operator update
+      void loop_update();     // directed loop update
 
       // propagates internal spins state according to the operator list. Useful
       // for making measurements of the correlations functions and averaging
@@ -85,11 +98,10 @@ namespace SSE
       void propagate(); 
 
       // access operator for spins
-      int operator[](const int) const{return spins[i];}
+      int operator[](const int& i) const{return _spins[i];}
       int ns() const {return _ns;}
       int xo() const {return _xo;}
-      int no() const {return _no;}
-      
+      int no() const {return _no;} 
   };
 }
 
