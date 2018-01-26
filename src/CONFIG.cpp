@@ -87,7 +87,7 @@ namespace SSE
   {
     // seed random number generator
     srand(time(NULL));
-    
+
     // initialize spin chain with random spins
     _spins = new int[_ns];
     for(int i=0; i<_ns; i++)
@@ -109,7 +109,7 @@ namespace SSE
       {
         _sites[0][i] = i;
         if(i<_nb - 1) _sites[1][i] = i+1;
-        else          _sites[1][i] = 1;
+        else          _sites[1][i] = 0;
       } 
     }
     else      // OBC
@@ -127,8 +127,8 @@ namespace SSE
     
     // start with an initial expansion order of 20. In both _oplist and _vtlist
     // the number 0 denotes the identity vertex.
-    _oplst.resize(20, 0);
-    _vtlst.resize(20, 0);
+    _oplst.resize(_xo, 0);
+    _vtlst.resize(_xo, 0);
 
     // we assume J=1. Using this, that constant offset guarenteeing positive
     // definiteness is given by 1 + D + eps. We assume a hamiltonian with bond
@@ -222,14 +222,14 @@ namespace SSE
   void CONFIG::diagupdt()
   {
     // loop through the configuration and decide to insert of remove an operator
-    for(int p=0; p<_x0; p++)
+    for(int p=0; p<_xo; p++)
     {
       if(_oplst[p] == 0)              // no operator present
       {
         // select a random bond to attempt insertion
         int rand_bond = rand() % _nb;
         int spin1 = _spins[_sites[0][rand_bond]];
-        int spin2 = _spins[_sites[0][rand_bond]];
+        int spin2 = _spins[_sites[1][rand_bond]];
         int id = _diagvrtid(spin1, spin2);
 
         // compare random number to weight
@@ -257,11 +257,11 @@ namespace SSE
       else                            //  off-diagonal operator present
       {
         // propagate the internal spin state
-        int bond = int(_oplst / 2) - 1;
+        int bond = int(_oplst[p] / 2) - 1;
         int spin1 = verts[_vtlst[p]][2];
         int spin2 = verts[_vtlst[p]][2];
-        _spins[sites[0][bond]] = spin1;
-        _spins[sites[1][bond]] = spin2; 
+        _spins[_sites[0][bond]] = spin1;
+        _spins[_sites[1][bond]] = spin2; 
       }
     }
   }
@@ -312,6 +312,50 @@ namespace SSE
         std::cout << _extprbs[i][j] << '\t';
       }
       std::cout << std::endl;
+    }
+  }
+
+  void CONFIG::disp_spins()
+  {
+    for(int i=0; i<_ns; i++)
+    {
+      if     (_spins[i] ==-1) std::cout << "-" << '\t';
+      else if(_spins[i] == 0) std::cout << "0" << '\t';
+      else                    std::cout << "+" << '\t';
+    }
+    std::cout << std::endl;
+  }
+
+  void CONFIG::disp_config()
+  {
+    disp_spins();
+    for(int p=0; p<_xo; p++)
+    {
+      if(_oplst[p] == 0)
+      {
+        std::cout << std::endl;
+        disp_spins();
+        continue;
+      }
+      int bond = (_oplst[p] / 2) - 1;
+      for(int i=0; i<bond; i++)
+      {
+        std::cout << '\t';
+      }
+      if(types[_vtlst[p]-1]) std::cout << "000000000" << std::endl;
+      else std::cout << "XXXXXXXXX" << std::endl;
+      disp_spins();
+    }
+  }
+
+  void CONFIG::disp_opers()
+  {
+    for(int p=0; p<_xo; p++)
+    {
+      std::cout << "[" << p << "]" 
+                << '\t' << _oplst[p] 
+                << '\t' << _vtlst[p] 
+                << std::endl;
     }
   }
 

@@ -130,6 +130,9 @@ namespace SSE
       void disp_wgts();
       void disp_outvrts(const bool&);
       void disp_extprbs(); 
+      void disp_spins();
+      void disp_config();
+      void disp_opers();
   };
 }
 
