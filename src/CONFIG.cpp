@@ -62,31 +62,21 @@ static const bool types[17] =
   false               // 17
 };
 
-static int outvrts[136][4];
-static int extprbs[136][4];
 
 // define display functions for the above structures (these could be folded into
 // the class... oh well.
 void disp_vert(const int& j)
 {
   int i = j-1;
+  if(j==0) return;
+  std::cout << "vertex id:" << '\t' << j << std::endl;
   std::cout << std::setw(5) << std::setfill(' ') 
             << std::left << verts[i][0] << '\t' << verts[i][1] 
             << std::endl 
             << std::setw(10) << std::setfill('-') << '-' << std::endl 
             << std::setw(5) << std::setfill(' ') 
             << std::left << verts[i][2] << '\t' << verts[i][3] 
-            << std::endl;
-}
-
-void disp_outvrts()
-{
-   
-}
-
-void disp_extprbs()
-{
-
+            << std::endl << std::endl;
 }
 
 namespace SSE
@@ -165,26 +155,23 @@ namespace SSE
     // first determine all output vertices
     for(unsigned int ref=0; ref<17; ref++)
     {
-      int vsp[4] = {verts[ref][0], verts[ref][1], verts[ref][2], verts[ref][3]};
       // loop through all in and out legs starting with up flips on the entrance
       // followed by down flips on the entrance
-      for(unsigned int i=0; i<8; i++){
+      for(unsigned int i=0; i<4; i++){
         for(unsigned int o=0; o<4; o++)
         {
-          if(i < 4)   // flip entrance up
-          {
-            vsp[i%4] = vsp[i%4] + 1;
-            if((i<2 || o<2) || (i>1 && o>1)) vsp[o] = vsp[o] - 1;
-            else                             vsp[o] = vsp[o] + 1;
-            outvrts[_prbindex(i, ref+1, 1)][o] = _vrtid(vsp);
-          }
-          else        // flip entrance down
-          {
-            vsp[i%4] = vsp[i%4] - 1;
-            if((i<2 || o<2) || (i>1 && o>1)) vsp[o] = vsp[o] + 1;
-            else                             vsp[o] = vsp[o] - 1;
-            outvrts[_prbindex(i, ref+1, 1)][o] = _vrtid(vsp); 
-          }
+          int vspu[4] = {verts[ref][0], verts[ref][1], 
+                         verts[ref][2], verts[ref][3]};
+          int vspd[4] = {verts[ref][0], verts[ref][1], 
+                         verts[ref][2], verts[ref][3]};
+          vspu[i] = vspu[i] + 1;
+          if((i<2 && o<2) || (i>1 && o>1)) vspu[o] = vspu[o] - 1;
+          else                             vspu[o] = vspu[o] + 1;
+          _outvrts[_prbindex(i, ref+1, 1)][o] = _vrtid(vspu);
+          vspd[i] = vspd[i] - 1;
+          if((i<2 && o<2) || (i>1 && o>1)) vspd[o] = vspd[o] + 1;
+          else                             vspd[o] = vspd[o] - 1;
+          _outvrts[_prbindex(i, ref+1, -1)][o] = _vrtid(vspd);
         }
       } 
     }
@@ -195,28 +182,137 @@ namespace SSE
       double den = 0.0;             // denominator for heatbath calculation  
       double sum = 0.0;             // used to calculate probability bounds
       std::array<double, 4> temp;   // temporary array to store porbabilies
-
-      for(x=0; x<4; x++) den += outvrts[row][x];      
+      for(x=0; x<4; x++) den += _vwgts[_outvrts[row][x]-1];      
       for(x=0; x<4; x++)
       {
-        if(outvrts[row][x] == 0) temp[x] = 0.0;
-        else temp[x] = _vwgts[outvrts[row][x]-1] / den;
+        if(_outvrts[row][x] == 0) temp[x] = 0.0;
+        else temp[x] = _vwgts[_outvrts[row][x]-1] / den;
       }
 
+      int lstval = 0;
       // convert these probabilities to bounds
       for(x=0; x<4; x++)
       {
-        int lstval = 0;
         sum += temp[x];
-        if(temp[x] == 0.0) extprbs[row][x] = 0.0;
+        if(temp[x] == 0.0) _extprbs[row][x] = 0.0;
         else
         {
           lstval = x;
-          extprbs[row][x] = sum;
+          _extprbs[row][x] = sum;
         }         
         // guarentee that last non-zero bound is 1. 
-        extprbs[row][lstval] = 1.0;
       }  
+      _extprbs[row][lstval] = 1.0;
     }
   }
+ 
+  void CONFIG::expoupdt()
+  {
+    // called during the equilibration phase. This update increases the total
+    // possible expansion order of the system.
+    int newxo = 1.33 * _no;
+    if(newxo > _xo)
+    {
+      _oplst.resize(newxo, 0);
+      _vtlst.resize(newxo, 0);
+      _xo = newxo;
+    }
+  }
+
+  void CONFIG::diagupdt()
+  {
+    // loop through the configuration and decide to insert of remove an operator
+    for(int p=0; p<_x0; p++)
+    {
+      if(_oplst[p] == 0)              // no operator present
+      {
+        // select a random bond to attempt insertion
+        int rand_bond = rand() % _nb;
+        int spin1 = _spins[_sites[0][rand_bond]];
+        int spin2 = _spins[_sites[0][rand_bond]];
+        int id = _diagvrtid(spin1, spin2);
+
+        // compare random number to weight
+        double r = (double)rand() / (double)RAND_MAX;
+        if((r*(_xo-_no)>_nb*_bt*_vwgts[id-1]))
+        {
+          _oplst[p] = (1 + rand_bond) * 2;
+          _vtlst[p] = id;
+          _no += 1;
+        }
+
+      }
+      else if(types[_vtlst[p]-1])     // diagonal operator present
+      {
+        // compare random number to removal probability
+        double r = (double)rand() / (double)RAND_MAX; 
+        int id = _vtlst[p];
+        if((r*_nb*_bt*_vwgts[id-1]) > (_xo-_no+1))
+        {
+          _oplst[p] = 0;
+          _vtlst[p] = 0;
+          _no -= 1;
+        }
+      }
+      else                            //  off-diagonal operator present
+      {
+        // propagate the internal spin state
+        int bond = int(_oplst / 2) - 1;
+        int spin1 = verts[_vtlst[p]][2];
+        int spin2 = verts[_vtlst[p]][2];
+        _spins[sites[0][bond]] = spin1;
+        _spins[sites[1][bond]] = spin2; 
+      }
+    }
+  }
+
+  void CONFIG::disp_wgts()
+  {
+    for(int i=0; i<17; i++)
+    {
+      std::cout << "vertex: " << i + 1 << " -> " << _vwgts[i] << std::endl;
+    }
+  }
+  
+  void CONFIG::disp_outvrts(const bool& image)
+  {
+    if(image)
+    {
+      for(int i=0; i<136; i++)
+      {
+        std::cout << std::setw(20) << std::setfill('-') << "-" << std::endl;    
+        if(i % 8 > 4) std::cout << "FLIP UP" << std::endl;
+        else std::cout << "FLIP DOWN" << std::endl;
+        std::cout << "entrance leg: " << i % 4 << std::endl;
+        disp_vert(i/8 + 1);
+        std::cout << std::setw(10) << std::setfill('=') << "=" << std::endl;
+        for(int j=0; j<4; j++)
+        {
+          if(_outvrts[i][j] == 0) continue;
+          std::cout << "exit leg: " << j << std::endl;
+          disp_vert(_outvrts[i][j]);
+          std::cout << std::endl;
+        }
+      } 
+    }
+    else
+    {
+      for(int i=0; i<136; i++){
+        for(int j=0; j<4; j++){
+          std::cout << _outvrts[i][j] <<'\t';
+        }
+      }
+    }  
+  }
+
+  void CONFIG::disp_extprbs()
+  {
+    for(int i=0; i<136; i++){
+      for(int j=0; j<4; j++){
+        std::cout << _extprbs[i][j] << '\t';
+      }
+      std::cout << std::endl;
+    }
+  }
+
 }
