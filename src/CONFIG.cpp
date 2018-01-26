@@ -234,7 +234,7 @@ namespace SSE
 
         // compare random number to weight
         double r = (double)rand() / (double)RAND_MAX;
-        if((r*(_xo-_no)>_nb*_bt*_vwgts[id-1]))
+        if((r*(_xo-_no)<_nb*_bt*_vwgts[id-1]))
         {
           _oplst[p] = (1 + rand_bond) * 2;
           _vtlst[p] = id;
@@ -247,7 +247,7 @@ namespace SSE
         // compare random number to removal probability
         double r = (double)rand() / (double)RAND_MAX; 
         int id = _vtlst[p];
-        if((r*_nb*_bt*_vwgts[id-1]) > (_xo-_no+1))
+        if((r*_nb*_bt*_vwgts[id-1])<(_xo-_no+1))
         {
           _oplst[p] = 0;
           _vtlst[p] = 0;
