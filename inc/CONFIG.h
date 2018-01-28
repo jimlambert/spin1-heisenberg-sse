@@ -12,6 +12,7 @@
 
 #include <vector>
 #include <array>
+#include <random>
 
 // These functions are used to display global source file variables
 void disp_vert(const int&);
@@ -41,18 +42,15 @@ namespace SSE
       // lookup tables for exit vertices and exit probability bounds for the
       // single spin flip loop update
       int               _outvrts[136][4];
-      double            _extprbs[136][4];
+      double            _extprbs[136][4]; 
 
-      // lookup tables for the exit vertices and exit probability bounds for the
-      // double flip loop update
-      int               _outvrts2[136][4];
-      double            _extprbs2[136][4]; 
+      std::mt19937* engptr;
 
       // function determines the probabily index given an input leg, an input
       // vertex, and a change type. Function is ideally inlined
       int _prbindex(const int& e, const int& v, const int& ds)
       {
-        return e + ((v - 1) * 8) + ((ds + 1) * 2);
+        return e + ((v - 1) * 8) + ds;
       }
 
       // given four spins, returns the corresponding vertex id. Also inlined

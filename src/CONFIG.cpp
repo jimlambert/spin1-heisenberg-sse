@@ -3,6 +3,8 @@
 #include <iostream>
 #include <iomanip>
 #include <array>
+#include <vector>
+#include <random>
 #include "CONFIG.h"
 
 // VRTTABLE   -   allowed vertices for the spin-1 AFM Heisenberg model with
@@ -60,6 +62,28 @@ static const bool types[17] =
   false,              // 15
   false,              // 16
   false               // 17
+};
+
+// Output flips for the completely deterministic two spin flip update.
+static const int dbouts[17][2] =
+{
+  {0, 0},             // 1
+  {3, 0},             // 2
+  {2, 0},             // 3
+  {5, 0},             // 4
+  {4, 0},             // 5
+  {9, 8},             // 6
+  {8, 9},             // 7
+  {7, 6},             // 8
+  {6, 7},             // 9
+  {11, 11},           // 10
+  {10, 10},           // 11
+  {13, 13},           // 12
+  {12, 12},           // 13
+  {15, 15},           // 14
+  {14, 14},           // 15
+  {17, 17},           // 16
+  {16, 16}            // 17  
 };
 
 
@@ -171,9 +195,9 @@ namespace SSE
           vspd[i] = vspd[i] - 1;
           if((i<2 && o<2) || (i>1 && o>1)) vspd[o] = vspd[o] + 1;
           else                             vspd[o] = vspd[o] - 1;
-          _outvrts[_prbindex(i, ref+1, -1)][o] = _vrtid(vspd);
+          _outvrts[_prbindex(i, ref+1, 0)][o] = _vrtid(vspd);
         }
-      } 
+      }
     }
     // now we determine transition probabilities and bounds
     for(unsigned int row=0; row<136; row++)
@@ -236,7 +260,7 @@ namespace SSE
         double r = (double)rand() / (double)RAND_MAX;
         if((r*(_xo-_no)<_nb*_bt*_vwgts[id-1]))
         {
-          _oplst[p] = (1 + rand_bond) * 2;
+          _oplst[p] = rand_bond;
           _vtlst[p] = id;
           _no += 1;
         }
@@ -257,13 +281,119 @@ namespace SSE
       else                            //  off-diagonal operator present
       {
         // propagate the internal spin state
-        int bond = int(_oplst[p] / 2) - 1;
+        int bond = _oplst[p];
         int spin1 = verts[_vtlst[p]][2];
         int spin2 = verts[_vtlst[p]][2];
         _spins[_sites[0][bond]] = spin1;
         _spins[_sites[1][bond]] = spin2; 
       }
     }
+  }
+
+  void CONFIG::loopupdt()
+  {
+    // initialize list containing information about vertex links
+    int* linklst = new int[4*_xo + 1];
+    int* vlast   = new int[_ns];
+    int* vfrst   = new int[_ns];
+    int v0, v1, v2, s1, s2;
+
+    for(int i=0; i<_ns; i++)
+    {
+      vlast[i] = -1;
+      vfrst[i] = -1;
+    }
+    for(int p=0; p<_xo; p++)
+    {
+      v0 = 4 * p + 1;
+      if(_oplst[p] == 0){
+        for(int i=0; i<4; i++){linklst[v0 + i] = 0;}
+      }
+      else
+      { 
+        s1 = _sites[0][_oplst[p]];
+        s2 = _sites[0][_oplst[p]];
+        v1 = vlast[s1];
+        v2 = vlast[s2];
+        if(v1 != -1)
+        {
+          linklst[v1] = v0; 
+          linklst[v0] = v1;
+        }
+        else vfrst[s1] = v0;
+        if(v1 != -1)
+        {
+          linklst[v2]   = v0 + 1;
+          linklst[v0+1] = v2;
+        }
+        else vfrst[s2] = v0 + 1;
+        vlast[s1] = v0 + 2;
+        vlast[s2] = v0 + 3;
+      }
+    }
+
+    // close links across imaginary time boundary
+    for(int i=0; i<_ns; i++){
+      if(vfrst[i] != -1){
+        linklst[vlast[i]] = vfrst[i];
+        linklst[vfrst[i]] = vlast[i];
+      }
+    }
+    
+    std::vector<int> newvrts;
+    for(unsigned int i=0; i<_vtlst.size(); i++)
+      newvrts.push_back(_vtlst[i]);
+
+    for(int p=0; p<_xo; p++)
+    {
+      if(_oplst[p] == 0) continue;
+      else
+      {
+        // Choose starting leg
+        int e = rand() % 4;
+        int v0 = 4 * p + 1 + e;
+        int vc = v0;
+        int ud;
+        // determine the ideal direction of the spin flip
+        if(verts[_vtlst[p]+1][e] == 0)      ud = rand() % 2;
+        else if(verts[_vtlst[p]+1][e] == 1) ud = 0;
+        else                                ud = 1;
+        do
+        { 
+          // generate a random number here
+          double r;
+          int x=e;
+          int ind = _prbindex(e, _vtlst[(vc-1)/4]+1, ud);
+          // choose exit leg
+          for(int i=0; i<4; i++)
+            if(r<_extprbs[_prbindex(e, _vtlst[ind]+1, ud)][i]) x=i;
+          if((e+x==5)||(e+x==1)) ud = ud^1; 
+          newvrts[(vc-1)/4] = _outvrts[ind][x];
+          vc = linklst[vc - e + x];
+          e = (vc-1) % 4;
+        }while(vc != v0);
+      }
+    }
+
+    // flip spins without operators
+    for(int i=0; i<_ns; i++)
+    {
+      if(vfrst[i] != -1)
+      {
+         int index = (vfrst[i]-1) / 4;
+         int leg   = (vfrst-1) % 4;
+         _spins[i] = verts[_vtlst[index]][leg];
+      }
+      else
+      {
+        // generate random new spin
+      }
+    }
+
+    // deallocate memory structures
+    delete [] linklst;
+    delete [] vlast;
+    delete [] vfrst;
   }
 
   void CONFIG::disp_wgts()
@@ -337,7 +467,7 @@ namespace SSE
         disp_spins();
         continue;
       }
-      int bond = (_oplst[p] / 2) - 1;
+      int bond = _oplst[p];
       for(int i=0; i<bond; i++)
       {
         std::cout << '\t';
@@ -347,6 +477,7 @@ namespace SSE
       disp_spins();
     }
   }
+  
 
   void CONFIG::disp_opers()
   {
