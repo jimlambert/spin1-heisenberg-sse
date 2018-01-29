@@ -115,13 +115,7 @@ namespace SSE
     // initialize spin chain with random spins
     _spins = new int[_ns];
     for(int i=0; i<_ns; i++)
-    {
-      double r = (double)rand() / (double)RAND_MAX;
-      if     (r < 0.33) _spins[i] = -1;
-      else if(r < 0.67) _spins[i] = 0;
-      else              _spins[i] = 1;
-    }
-    
+      _spins[i] = rspin(mteng); 
     // initialize the sites array which contains the bond structure
     if(_bc)   // PBC
     {
@@ -174,6 +168,13 @@ namespace SSE
     _calcprobs(); 
   }
   
+  CONFIG::~CONFIG()
+  {
+    delete [] _spins;
+    delete [] _sites[0];
+    delete [] _sites[1];
+  }
+
   void CONFIG::_calcprobs()
   {
     // first determine all output vertices
@@ -205,7 +206,8 @@ namespace SSE
       int x;                        // exit leg index
       double den = 0.0;             // denominator for heatbath calculation  
       double sum = 0.0;             // used to calculate probability bounds
-      std::array<double, 4> temp;   // temporary array to store porbabilies
+      std::vector<double> temp;     // temporary array to store porbabilies
+      temp.resize(4, 0.0);
       for(x=0; x<4; x++) den += _vwgts[_outvrts[row][x]-1];      
       for(x=0; x<4; x++)
       {
@@ -248,7 +250,7 @@ namespace SSE
     // loop through the configuration and decide to insert of remove an operator
     for(int p=0; p<_xo; p++)
     {
-      if(_oplst[p] == 0)              // no operator present
+      if(_vtlst[p] == 0)              // no operator present
       {
         // select a random bond to attempt insertion
         int rand_bond = rand() % _nb;
@@ -282,7 +284,7 @@ namespace SSE
       {
         // propagate the internal spin state
         int bond = _oplst[p];
-        int spin1 = verts[_vtlst[p]][2];
+        int spin1 = verts[_vtlst[p]][1];
         int spin2 = verts[_vtlst[p]][2];
         _spins[_sites[0][bond]] = spin1;
         _spins[_sites[1][bond]] = spin2; 
@@ -293,26 +295,25 @@ namespace SSE
   void CONFIG::loopupdt()
   {
     // initialize list containing information about vertex links
-    int* linklst = new int[4*_xo + 1];
-    int* vlast   = new int[_ns];
-    int* vfrst   = new int[_ns];
+    std::vector<int> linklst; 
+    std::vector<int> vfrst;
+    std::vector<int> vlast;
+    linklst.resize(4*_xo+1, 0);
+    vfrst.resize(_ns, -1);
+    vlast.resize(_ns, -1);
+
     int v0, v1, v2, s1, s2;
 
-    for(int i=0; i<_ns; i++)
-    {
-      vlast[i] = -1;
-      vfrst[i] = -1;
-    }
     for(int p=0; p<_xo; p++)
     {
       v0 = 4 * p + 1;
-      if(_oplst[p] == 0){
-        for(int i=0; i<4; i++){linklst[v0 + i] = 0;}
+      if(_vtlst[p] == 0){
+        for(int i=0; i<4; i++) linklst[v0 + i] = 0;
       }
       else
       { 
         s1 = _sites[0][_oplst[p]];
-        s2 = _sites[0][_oplst[p]];
+        s2 = _sites[1][_oplst[p]];
         v1 = vlast[s1];
         v2 = vlast[s2];
         if(v1 != -1)
@@ -321,7 +322,7 @@ namespace SSE
           linklst[v0] = v1;
         }
         else vfrst[s1] = v0;
-        if(v1 != -1)
+        if(v2 != -1)
         {
           linklst[v2]   = v0 + 1;
           linklst[v0+1] = v2;
@@ -340,6 +341,13 @@ namespace SSE
       }
     }
     
+    for(int i=1; i<(4*_xo+1); i++)
+    {
+      std::cout << "[" << i << "]" << '\t' << linklst[i]
+                << '\t';
+      if(i%4 == 0) std::cout << std::endl;
+    }
+
     std::vector<int> newvrts;
     for(unsigned int i=0; i<_vtlst.size(); i++)
       newvrts.push_back(_vtlst[i]);
@@ -354,26 +362,33 @@ namespace SSE
         int v0 = 4 * p + 1 + e;
         int vc = v0;
         int ud;
-        // determine the ideal direction of the spin flip
+        // determine the initial direction of the spin flip
         if(verts[_vtlst[p]+1][e] == 0)      ud = rand() % 2;
         else if(verts[_vtlst[p]+1][e] == 1) ud = 0;
         else                                ud = 1;
         do
         { 
           // generate a random number here
-          double r;
+          double r = rdist(mteng);
           int x=e;
           int ind = _prbindex(e, _vtlst[(vc-1)/4]+1, ud);
           // choose exit leg
           for(int i=0; i<4; i++)
-            if(r<_extprbs[_prbindex(e, _vtlst[ind]+1, ud)][i]) x=i;
-          if((e+x==5)||(e+x==1)) ud = ud^1; 
+            if(r<_extprbs[ind][i]) x=i;
+          if((e+x==5)||(e+x==1)) ud = ud^1;
+          
+          // change vertex 
           newvrts[(vc-1)/4] = _outvrts[ind][x];
+          
+          // move to new leg
           vc = linklst[vc - e + x];
           e = (vc-1) % 4;
         }while(vc != v0);
       }
     }
+    // commit changes
+    for(unsigned int i=0; i<_vtlst.size(); i++)
+      _vtlst[i] = newvrts[i];
 
     // flip spins without operators
     for(int i=0; i<_ns; i++)
@@ -381,19 +396,11 @@ namespace SSE
       if(vfrst[i] != -1)
       {
          int index = (vfrst[i]-1) / 4;
-         int leg   = (vfrst-1) % 4;
+         int leg   = (vfrst[i]-1) % 4;
          _spins[i] = verts[_vtlst[index]][leg];
       }
-      else
-      {
-        // generate random new spin
-      }
+      else _spins[i] = rspin(mteng);    // generate new spin
     }
-
-    // deallocate memory structures
-    delete [] linklst;
-    delete [] vlast;
-    delete [] vfrst;
   }
 
   void CONFIG::disp_wgts()
@@ -428,9 +435,11 @@ namespace SSE
     else
     {
       for(int i=0; i<136; i++){
+        std::cout << "[" << i << "][";
         for(int j=0; j<4; j++){
-          std::cout << _outvrts[i][j] <<'\t';
+          std::cout << _outvrts[i][j] << " ";
         }
+        std::cout << "]" << std::endl;
       }
     }  
   }
@@ -488,6 +497,5 @@ namespace SSE
                 << '\t' << _vtlst[p] 
                 << std::endl;
     }
-  }
-
+  }  
 }

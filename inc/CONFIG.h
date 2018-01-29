@@ -44,13 +44,17 @@ namespace SSE
       int               _outvrts[136][4];
       double            _extprbs[136][4]; 
 
-      std::mt19937* engptr;
+      // seed random number generator and initialize distributions
+      std::random_device rd;
+      std::mt19937 mteng{rd()};
+      std::uniform_real_distribution<> rdist{0.0, 0.99999};
+      std::uniform_int_distribution<>  rspin{-1, 1};
 
       // function determines the probabily index given an input leg, an input
       // vertex, and a change type. Function is ideally inlined
       int _prbindex(const int& e, const int& v, const int& ds)
       {
-        return e + ((v - 1) * 8) + ds;
+        return e + ((v - 1) * 8) + 4*ds;
       }
 
       // given four spins, returns the corresponding vertex id. Also inlined
@@ -109,6 +113,8 @@ namespace SSE
              const bool&      // true for periodic boudary conditions
             );
       
+      ~CONFIG();
+
       void expoupdt();     // expansion order update
       void diagupdt();     // diagonal operator update
       void loopupdt();     // directed loop update
