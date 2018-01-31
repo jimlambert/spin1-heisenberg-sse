@@ -1,5 +1,3 @@
-#include <cstdlib>
-#include <ctime>
 #include <iostream>
 #include <iomanip>
 #include <array>
@@ -109,13 +107,10 @@ namespace SSE
                  const double& E, const bool& BC) : 
                  _ns(N), _xo(20), _no(0), _bt(1.0/T), _df(D), _ep(E), _bc(BC)
   {
-    // seed random number generator
-    srand(time(NULL));
-
     // initialize spin chain with random spins
     _spins = new int[_ns];
     for(int i=0; i<_ns; i++)
-      _spins[i] = rspin(mteng); 
+      _spins[i] = _rspin(_mteng); 
     // initialize the sites array which contains the bond structure
     if(_bc)   // PBC
     {
@@ -128,7 +123,7 @@ namespace SSE
         _sites[0][i] = i;
         if(i<_nb - 1) _sites[1][i] = i+1;
         else          _sites[1][i] = 0;
-      } 
+      }
     }
     else      // OBC
     {
@@ -142,7 +137,9 @@ namespace SSE
         _sites[1][i] = i + 1;
       }
     }
-    
+
+    _rbond = new std::uniform_int_distribution<>{0, _nb-1}; 
+  
     // start with an initial expansion order of 20. In both _oplist and _vtlist
     // the number 0 denotes the identity vertex.
     _oplst.resize(_xo, 0);
@@ -173,6 +170,7 @@ namespace SSE
     delete [] _spins;
     delete [] _sites[0];
     delete [] _sites[1];
+    delete    _rbond;
   }
 
   void CONFIG::_calcprobs()
@@ -253,13 +251,13 @@ namespace SSE
       if(_vtlst[p] == 0)              // no operator present
       {
         // select a random bond to attempt insertion
-        int rand_bond = rand() % _nb;
+        int rand_bond = (*_rbond)(_mteng);
         int spin1 = _spins[_sites[0][rand_bond]];
         int spin2 = _spins[_sites[1][rand_bond]];
         int id = _diagvrtid(spin1, spin2);
 
         // compare random number to weight
-        double r = (double)rand() / (double)RAND_MAX;
+        double r = _rdist(_mteng);
         if((r*(_xo-_no)<_nb*_bt*_vwgts[id-1]))
         {
           _oplst[p] = rand_bond;
@@ -271,7 +269,7 @@ namespace SSE
       else if(types[_vtlst[p]-1])     // diagonal operator present
       {
         // compare random number to removal probability
-        double r = (double)rand() / (double)RAND_MAX; 
+        double r = _rdist(_mteng); 
         int id = _vtlst[p];
         if((r*_nb*_bt*_vwgts[id-1])<(_xo-_no+1))
         {
@@ -358,32 +356,48 @@ namespace SSE
       else
       {
         // Choose starting leg
-        int e = rand() % 4;
+        int e = _rleg(_mteng);
         int v0 = 4 * p + 1 + e;
         int vc = v0;
         int ud;
         // determine the initial direction of the spin flip
-        if(verts[_vtlst[p]+1][e] == 0)      ud = rand() % 2;
-        else if(verts[_vtlst[p]+1][e] == 1) ud = 0;
-        else                                ud = 1;
+        if(verts[newvrts[p]-1][e] == 0)      ud = _rud(_mteng);
+        else if(verts[newvrts[p]-1][e] == 1) ud = 0;
+        else                                 ud = 1;
+        int counter = 0;
+        std::cout << "initial leg: " << v0 << std::endl;
+        std::cout << "------------" << std::endl;
         do
         { 
+          std::cout << "current link: " << vc << std::endl;
+          std::cout << "entrance leg: " << e << std::endl;
+          std::cout << "flip direction: " << ud << std::endl;
           // generate a random number here
-          double r = rdist(mteng);
+          double r = _rdist(_mteng);
           int x=e;
-          int ind = _prbindex(e, _vtlst[(vc-1)/4]+1, ud);
+          int ind = _prbindex(e, newvrts[(vc-1)/4], ud);
+          std::cout << "initial vertex id: " << newvrts[(vc-1)/4] 
+                    << std::endl;
           // choose exit leg
           for(int i=0; i<4; i++)
             if(r<_extprbs[ind][i]) x=i;
+          
+          std::cout << "exit leg: " << x << std::endl;
           if((e+x==5)||(e+x==1)) ud = ud^1;
           
           // change vertex 
           newvrts[(vc-1)/4] = _outvrts[ind][x];
           
+          std::cout << "final vertex id: " << newvrts[(vc-1)/4]
+                    << std::endl;
           // move to new leg
           vc = linklst[vc - e + x];
           e = (vc-1) % 4;
-        }while(vc != v0);
+          std::cout << "next link: " << vc << std::endl;
+          std::cout << "----------" << std::endl;
+          counter += 1;
+        }while(linklst[vc] != v0 || counter > 5);
+        std::cout << "LOOP OVER" << std::endl;
       }
     }
     // commit changes
@@ -399,7 +413,7 @@ namespace SSE
          int leg   = (vfrst[i]-1) % 4;
          _spins[i] = verts[_vtlst[index]][leg];
       }
-      else _spins[i] = rspin(mteng);    // generate new spin
+      else _spins[i] = _rspin(_mteng);    // generate new spin
     }
   }
 
@@ -470,7 +484,7 @@ namespace SSE
     disp_spins();
     for(int p=0; p<_xo; p++)
     {
-      if(_oplst[p] == 0)
+      if(_vtlst[p] == 0)
       {
         std::cout << std::endl;
         disp_spins();

@@ -6,7 +6,8 @@ using namespace std;
 int main()
 {
   int N = 10;
-  SSE::CONFIG testconf(N, 0.01, 0.0, 0.0, true);
+  SSE::CONFIG testconf(N, 5, 0.0, 0.0, true);
+  //testconf.disp_outvrts(false);
   testconf.diagupdt();
   testconf.disp_config();
   testconf.disp_opers();

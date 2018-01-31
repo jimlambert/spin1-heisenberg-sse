@@ -45,10 +45,15 @@ namespace SSE
       double            _extprbs[136][4]; 
 
       // seed random number generator and initialize distributions
-      std::random_device rd;
-      std::mt19937 mteng{rd()};
-      std::uniform_real_distribution<> rdist{0.0, 0.99999};
-      std::uniform_int_distribution<>  rspin{-1, 1};
+      std::random_device _rd;
+      std::mt19937 _mteng{_rd()};
+      std::uniform_real_distribution<> _rdist{0.0, 0.99999};
+      std::uniform_int_distribution<>  _rspin{-1, 1};
+      std::uniform_int_distribution<>  _rleg{0, 3};
+      std::uniform_int_distribution<>  _rud{0, 1};
+      
+      // needs to be initialized after number of bonds is known
+      std::uniform_int_distribution<>* _rbond;
 
       // function determines the probabily index given an input leg, an input
       // vertex, and a change type. Function is ideally inlined
