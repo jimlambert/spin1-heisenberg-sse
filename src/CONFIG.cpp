@@ -282,8 +282,8 @@ namespace SSE
       {
         // propagate the internal spin state
         int bond = _oplst[p];
-        int spin1 = verts[_vtlst[p]][1];
-        int spin2 = verts[_vtlst[p]][2];
+        int spin1 = verts[_vtlst[p]][2];
+        int spin2 = verts[_vtlst[p]][3];
         _spins[_sites[0][bond]] = spin1;
         _spins[_sites[1][bond]] = spin2; 
       }
@@ -338,14 +338,14 @@ namespace SSE
         linklst[vfrst[i]] = vlast[i];
       }
     }
-    
+    /* 
     for(int i=1; i<(4*_xo+1); i++)
     {
       std::cout << "[" << i << "]" << '\t' << linklst[i]
                 << '\t';
       if(i%4 == 0) std::cout << std::endl;
     }
-
+    */
     std::vector<int> newvrts;
     for(unsigned int i=0; i<_vtlst.size(); i++)
       newvrts.push_back(_vtlst[i]);
@@ -364,40 +364,29 @@ namespace SSE
         if(verts[newvrts[p]-1][e] == 0)      ud = _rud(_mteng);
         else if(verts[newvrts[p]-1][e] == 1) ud = 0;
         else                                 ud = 1;
-        int counter = 0;
-        std::cout << "initial leg: " << v0 << std::endl;
-        std::cout << "------------" << std::endl;
         do
         { 
-          std::cout << "current link: " << vc << std::endl;
-          std::cout << "entrance leg: " << e << std::endl;
-          std::cout << "flip direction: " << ud << std::endl;
           // generate a random number here
           double r = _rdist(_mteng);
           int x=e;
           int ind = _prbindex(e, newvrts[(vc-1)/4], ud);
-          std::cout << "initial vertex id: " << newvrts[(vc-1)/4] 
-                    << std::endl;
           // choose exit leg
           for(int i=0; i<4; i++)
-            if(r<_extprbs[ind][i]) x=i;
-          
-          std::cout << "exit leg: " << x << std::endl;
+          {
+            if(r<_extprbs[ind][i])
+            {
+              x=i; 
+              break;
+            }
+          }
           if((e+x==5)||(e+x==1)) ud = ud^1;
-          
+          if(x==e)               ud = ud^1;
           // change vertex 
           newvrts[(vc-1)/4] = _outvrts[ind][x];
-          
-          std::cout << "final vertex id: " << newvrts[(vc-1)/4]
-                    << std::endl;
           // move to new leg
           vc = linklst[vc - e + x];
           e = (vc-1) % 4;
-          std::cout << "next link: " << vc << std::endl;
-          std::cout << "----------" << std::endl;
-          counter += 1;
-        }while(linklst[vc] != v0 || counter > 5);
-        std::cout << "LOOP OVER" << std::endl;
+        }while(linklst[vc] != v0);
       }
     }
     // commit changes
@@ -461,10 +450,13 @@ namespace SSE
   void CONFIG::disp_extprbs()
   {
     for(int i=0; i<136; i++){
+      int vid = (i / 8 + 1);
+      if(i%8==0) std::cout << "vertex: " << vid << std::endl;
       for(int j=0; j<4; j++){
         std::cout << _extprbs[i][j] << '\t';
       }
       std::cout << std::endl;
+      if(i%8==7) std::cout << "------------------------" << std::endl;
     }
   }
 
@@ -496,7 +488,12 @@ namespace SSE
         std::cout << '\t';
       }
       if(types[_vtlst[p]-1]) std::cout << "000000000" << std::endl;
-      else std::cout << "XXXXXXXXX" << std::endl;
+      else
+      { 
+        std::cout << "XXXXXXXXX" << std::endl;
+        _spins[_sites[0][_oplst[p]]] = verts[_vtlst[p]-1][2];
+        _spins[_sites[1][_oplst[p]]] = verts[_vtlst[p]-1][3];
+      } 
       disp_spins();
     }
   }
