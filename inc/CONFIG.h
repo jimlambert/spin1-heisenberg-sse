@@ -1,6 +1,6 @@
 // ----------------------------------------------------------------------------- 
 // Author:  James Lambert
-// Created: Januaray 28th, 2018
+// Created: January 28th, 2018
 //
 // Class which contains all key data structures for the stochastic series
 // expansion for the spin-1 AFM Heisenberg model with uniaxial anisotropy, as 
@@ -134,6 +134,9 @@ namespace SSE
       int ns() const {return _ns;}
       int xo() const {return _xo;}
       int no() const {return _no;}
+      int op(int p) const {return _vtlst[p];}
+
+      double eo() const {return 1 + _df + _ep;}
 
       // display functions - useful for debugging
       void disp_wgts();

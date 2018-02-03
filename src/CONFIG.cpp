@@ -282,8 +282,8 @@ namespace SSE
       {
         // propagate the internal spin state
         int bond = _oplst[p];
-        int spin1 = verts[_vtlst[p]][2];
-        int spin2 = verts[_vtlst[p]][3];
+        int spin1 = verts[_vtlst[p]-1][2];
+        int spin2 = verts[_vtlst[p]-1][3];
         _spins[_sites[0][bond]] = spin1;
         _spins[_sites[1][bond]] = spin2; 
       }
@@ -338,7 +338,8 @@ namespace SSE
         linklst[vfrst[i]] = vlast[i];
       }
     }
-    /* 
+    
+    /*  Print vertex list for debugging purposes
     for(int i=1; i<(4*_xo+1); i++)
     {
       std::cout << "[" << i << "]" << '\t' << linklst[i]
@@ -346,6 +347,7 @@ namespace SSE
       if(i%4 == 0) std::cout << std::endl;
     }
     */
+    
     std::vector<int> newvrts;
     for(unsigned int i=0; i<_vtlst.size(); i++)
       newvrts.push_back(_vtlst[i]);
@@ -400,7 +402,7 @@ namespace SSE
       {
          int index = (vfrst[i]-1) / 4;
          int leg   = (vfrst[i]-1) % 4;
-         _spins[i] = verts[_vtlst[index]][leg];
+         _spins[i] = verts[_vtlst[index]-1][leg];
       }
       else _spins[i] = _rspin(_mteng);    // generate new spin
     }
@@ -487,13 +489,18 @@ namespace SSE
       {
         std::cout << '\t';
       }
-      if(types[_vtlst[p]-1]) std::cout << "000000000" << std::endl;
+      if(types[_vtlst[p]-1]) std::cout << "000000000";
       else
       { 
-        std::cout << "XXXXXXXXX" << std::endl;
+        std::cout << "XXXXXXXXX";
         _spins[_sites[0][_oplst[p]]] = verts[_vtlst[p]-1][2];
         _spins[_sites[1][_oplst[p]]] = verts[_vtlst[p]-1][3];
       } 
+      for(int i=0; i<(_nb - bond + 1); i++)
+      {
+        std::cout << '\t';
+      }
+      std::cout << _vtlst[p] << std::endl;
       disp_spins();
     }
   }
