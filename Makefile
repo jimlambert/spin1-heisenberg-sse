@@ -11,7 +11,7 @@ INCLUDE = -I./inc/
 $(MAIN): $(OBJ_FILES)
 	$(CXX) $(CXX_FLAGS) $(INCLUDE) -o $@ $^
 
-obj/%.o: src/%.cpp  
+obj/%.o: src/%.cpp 
 	$(CXX) $(CXX_FLAGS) $(INCLUDE) -c -o $@ $<
 
 clean:	

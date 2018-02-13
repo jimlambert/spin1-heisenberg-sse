@@ -14,10 +14,6 @@
 #include <array>
 #include <random>
 
-// These functions are used to display global source file variables
-void disp_vert(const int&);
-
-
 namespace SSE
 {
   class CONFIG
@@ -32,6 +28,7 @@ namespace SSE
       double            _df;        // single ion anisotropy term
       double            _ep;        // small parameter to add to weights
       bool              _bc;        // boundary conditions, PBC=true
+      int               _pi;        // current place in the propagation list
 
       int*              _spins;     // contains spins on each bond site
       int*              _sites[2];  // contains structure of lattice
@@ -129,14 +126,20 @@ namespace SSE
       // over the configuration space.
       void propagate(); 
 
-      // access operator for spins
-      int operator[](const int& i) const{return _spins[i];}
-      int ns() const {return _ns;}
-      int xo() const {return _xo;}
-      int no() const {return _no;}
+      // access operator for spin chain
+      int operator[](const int i) const{return _spins[i];}
+      
+      // access members for internal configuration variables
+      int ns()      const {return _ns;}
+      int nb()      const {return _nb;}
+      int xo()      const {return _xo;}
+      int no()      const {return _no;}
+      double bt()   const {return _bt;}
+      double df()   const {return _df;}
+      double ep()   const {return _ep;}
+      bool bc()     const {return _bc;}
       int op(int p) const {return _vtlst[p];}
-
-      double eo() const {return 1 + _df + _ep;}
+      double eo()   const {return 1 + _df + _ep;}
 
       // display functions - useful for debugging
       void disp_wgts();
@@ -145,6 +148,75 @@ namespace SSE
       void disp_spins();
       void disp_config();
       void disp_opers();
+      void disp_vert(const int&);
+      
+      // the configuration arrays are hard coded and carried around by the
+      // object as public members so that the measurements functions may use
+      // them if necessary 
+      const int verts[17][4] = 
+      {
+        { 0,   0,  0,  0},  // 1
+        { 1,   0,  1,  0},  // 2
+        {-1,   0, -1,  0},  // 3
+        { 0,   1,  0,  1},  // 4 
+        { 0,  -1,  0, -1},  // 5 
+        { 1,   1,  1,  1},  // 6
+        {-1,  -1, -1, -1},  // 7 
+        { 1,  -1,  1, -1},  // 8
+        {-1,   1, -1,  1},  // 9
+        { 0,   0,  1, -1},  // 10
+        { 0,   0, -1,  1},  // 11 
+        {-1,   1,  0,  0},  // 12
+        { 1,  -1,  0,  0},  // 13
+        { 1,   0,  0,  1},  // 14
+        {-1,   0,  0, -1},  // 15
+        { 0,   1,  1,  0},  // 16 
+        { 0,  -1, -1,  0}   // 17
+      };
+
+      const bool types[17] = 
+      {
+        true,               // 1
+        true,               // 2
+        true,               // 3
+        true,               // 4
+        true,               // 5
+        true,               // 6
+        true,               // 7
+        true,               // 8
+        true,               // 9
+        false,              // 10 
+        false,              // 11
+        false,              // 12
+        false,              // 13
+        false,              // 14
+        false,              // 15
+        false,              // 16
+        false               // 17
+      };
+
+      // Output flips for the completely deterministic two spin flip update.
+      const int dbouts[17][2] =
+      {
+        {0, 0},             // 1
+        {3, 0},             // 2
+        {2, 0},             // 3
+        {5, 0},             // 4
+        {4, 0},             // 5
+        {9, 8},             // 6
+        {8, 9},             // 7
+        {7, 6},             // 8
+        {6, 7},             // 9
+        {11, 11},           // 10
+        {10, 10},           // 11
+        {13, 13},           // 12
+        {12, 12},           // 13
+        {15, 15},           // 14
+        {14, 14},           // 15
+        {17, 17},           // 16
+        {16, 16}            // 17  
+      };
+
   };
 }
 

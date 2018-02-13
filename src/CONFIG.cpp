@@ -5,107 +5,12 @@
 #include <random>
 #include "CONFIG.h"
 
-// VRTTABLE   -   allowed vertices for the spin-1 AFM Heisenberg model with
-//                uniaxial anisotropy
-// TYPTABLE   -   Contains array that indicates whether the vertex at the 
-//                corresponding index is diagonal or off-diagonal
-// OUTTABLE   -   contains output vertices each corresponding to exiting on a
-//                given leg of the bare vertex
-// PRBTABLE   -   contains the bounds for the transition probabilities given an
-//                input leg, input vertex, and change type.
-
-//typedef std::array<<std::array<int, 4>,    17>   VRTTABLE;   
-//typedef std::array<bool,                   17>   TYPTABLE;
-//typedef std::array<<std::array<int, 4>,    136>  OUTTABLE;   
-//typedef std::array<<std::array<double, 4>, 136>  PRBTABLE;   
-
-//std::array<<std::array<int, 4>, 17> verts = 
-static const int verts[17][4] = 
-{
-  { 0,   0,  0,  0},  // 1
-  { 1,   0,  1,  0},  // 2
-  {-1,   0, -1,  0},  // 3
-  { 0,   1,  0,  1},  // 4 
-  { 0,  -1,  0, -1},  // 5 
-  { 1,   1,  1,  1},  // 6
-  {-1,  -1, -1, -1},  // 7 
-  { 1,  -1,  1, -1},  // 8
-  {-1,   1, -1,  1},  // 9
-  { 0,   0,  1, -1},  // 10
-  { 0,   0, -1,  1},  // 11 
-  {-1,   1,  0,  0},  // 12
-  { 1,  -1,  0,  0},  // 13
-  { 1,   0,  0,  1},  // 14
-  {-1,   0,  0, -1},  // 15
-  { 0,   1,  1,  0},  // 16 
-  { 0,  -1, -1,  0}   // 17
-};
-
-static const bool types[17] = 
-{
-  true,               // 1
-  true,               // 2
-  true,               // 3
-  true,               // 4
-  true,               // 5
-  true,               // 6
-  true,               // 7
-  true,               // 8
-  true,               // 9
-  false,              // 10 
-  false,              // 11
-  false,              // 12
-  false,              // 13
-  false,              // 14
-  false,              // 15
-  false,              // 16
-  false               // 17
-};
-
-// Output flips for the completely deterministic two spin flip update.
-static const int dbouts[17][2] =
-{
-  {0, 0},             // 1
-  {3, 0},             // 2
-  {2, 0},             // 3
-  {5, 0},             // 4
-  {4, 0},             // 5
-  {9, 8},             // 6
-  {8, 9},             // 7
-  {7, 6},             // 8
-  {6, 7},             // 9
-  {11, 11},           // 10
-  {10, 10},           // 11
-  {13, 13},           // 12
-  {12, 12},           // 13
-  {15, 15},           // 14
-  {14, 14},           // 15
-  {17, 17},           // 16
-  {16, 16}            // 17  
-};
-
-
-// define display functions for the above structures (these could be folded into
-// the class... oh well.
-void disp_vert(const int& j)
-{
-  int i = j-1;
-  if(j==0) return;
-  std::cout << "vertex id:" << '\t' << j << std::endl;
-  std::cout << std::setw(5) << std::setfill(' ') 
-            << std::left << verts[i][0] << '\t' << verts[i][1] 
-            << std::endl 
-            << std::setw(10) << std::setfill('-') << '-' << std::endl 
-            << std::setw(5) << std::setfill(' ') 
-            << std::left << verts[i][2] << '\t' << verts[i][3] 
-            << std::endl << std::endl;
-}
-
 namespace SSE
 {
   CONFIG::CONFIG(const int& N, const double& T, const double& D, 
                  const double& E, const bool& BC) : 
-                 _ns(N), _xo(20), _no(0), _bt(1.0/T), _df(D), _ep(E), _bc(BC)
+                 _ns(N), _xo(20), _no(0), _bt(1.0/T), _df(D), _ep(E), _bc(BC),
+                 _pi(0)
   {
     // initialize spin chain with random spins
     _spins = new int[_ns];
@@ -407,6 +312,21 @@ namespace SSE
       else _spins[i] = _rspin(_mteng);    // generate new spin
     }
   }
+  
+  void CONFIG::propagate()
+  {
+    if(_vtlst[_pi] == 0)
+    {
+      _pi = (_pi + 1) % _xo;
+      return;
+    }
+    if(!types[_vtlst[_pi]-1]) 
+    {
+      _spins[_sites[0][_oplst[_pi]]] = verts[_vtlst[_pi]-1][2];
+      _spins[_sites[1][_oplst[_pi]]] = verts[_vtlst[_pi]-1][3];
+    }
+    _pi = (_pi + 1) % _xo;
+  }
 
   void CONFIG::disp_wgts()
   {
@@ -505,7 +425,6 @@ namespace SSE
     }
   }
   
-
   void CONFIG::disp_opers()
   {
     for(int p=0; p<_xo; p++)
@@ -515,5 +434,19 @@ namespace SSE
                 << '\t' << _vtlst[p] 
                 << std::endl;
     }
-  }  
+  }
+  
+  void CONFIG::disp_vert(const int& j)
+  {
+    int i = j-1;
+    if(j==0) return;
+    std::cout << "vertex id:" << '\t' << j << std::endl;
+    std::cout << std::setw(5) << std::setfill(' ') 
+              << std::left << verts[i][0] << '\t' << verts[i][1] 
+              << std::endl 
+              << std::setw(10) << std::setfill('-') << '-' << std::endl 
+              << std::setw(5) << std::setfill(' ') 
+              << std::left << verts[i][2] << '\t' << verts[i][3] 
+              << std::endl << std::endl;
+  }
 }
