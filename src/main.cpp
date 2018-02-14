@@ -17,9 +17,9 @@ int main()
                     true,     // measure square of string correlator
                     true,     // measure average of square of sum
                     true,     // measure S_z correlator
-                    true,    // measure self correlations
+                    true,     // measure self correlations
                     true,     // measure spin averages
-                    false     // measure string correlations
+                    true      // measure string correlations
                     );
   /* 
   testconf.diagupdt();

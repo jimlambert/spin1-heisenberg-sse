@@ -261,54 +261,58 @@ namespace SSE
   {
     std::ofstream output;
     output.open(ofile);
-    //std::cout << "writing to file" << std::endl;
-    // output system configuration 
-    output << std::setw(25) << std::left << "system size:" << std::setw(5)  
+    output << std::setw(104) << std::setfill('-') << "-" << '\n';
+    output << std::setfill(' ');
+    output << std::setw(99) << std::left << "system size:" << std::setw(5)  
            << _ns << '\n';
-    output << std::setw(25) << std::left << "d-field:"     << std::setw(5)
+    output << std::setw(99) << std::left << "d-field:"     << std::setw(5)
            << _df << '\n';
-    output << std::setw(25) << std::left << "beta:"        << std::setw(5)
+    output << std::setw(99) << std::left << "beta:"        << std::setw(5)
            << _bt << '\n';
-    output << std::setw(25) << std::left << "boundary conditions:";
+    output << std::setw(95) << std::left << "boundary conditions:";
     if(_bc) output << std::setw(9) << "periodic" << '\n';
     else    output << std::setw(9) << "open"     << '\n';
-    output << std::setw(98) << std::setfill('-') << "-" << '\n';
+    output << std::setw(104) << std::setfill('-') << "-" << '\n';
     output << std::setfill(' ');
-    output << std::setw(25) << std::left << "energy:" 
-           << std::setw(8) << std::setprecision(5) 
+    output << std::setw(88) << std::left << "energy:" 
+           << std::setw(8) << std::setprecision(3) 
            << std::fixed << _energy.ave() 
            << std::setw(8) << std::setprecision(1) 
            << std::scientific << _energy.err()  
            << '\n';
-    output << std::setw(25) << std::left << "string corr. squared:"
-           << std::setw(8) << std::setprecision(5) << _sqarstrg.ave() 
-           << std::setw(8) << std::setprecision(5) << _sqarstrg.err()
+    output << std::setw(88) << std::left << "string corr. squared:"
+           << std::setw(8) << std::setprecision(3) 
+           << std::fixed << _sqarstrg.ave() 
+           << std::setw(8) << std::setprecision(1) 
+           << std::scientific << _sqarstrg.err()
            << '\n';
-    output << std::setw(25) << "staggered mag. squared:" 
-           << std::setw(8) << std::setprecision(5) << _sqarspin.ave()
-           << std::setw(8) << std::setprecision(5) << _sqarspin.err()
+    output << std::setw(88) << "staggered mag. squared:" 
+           << std::setw(8) << std::setprecision(3) 
+           << std::fixed << _sqarspin.ave()
+           << std::setw(8) << std::setprecision(1) 
+           << std::scientific << _sqarspin.err()
            << '\n';
-    output << std::setw(98) << std::setfill('-') << "-" << '\n';
+    output << std::setw(104) << std::setfill('-') << "-" << '\n';
     output << std::setfill(' ');
     output << std::setw(6)  << "Site";
     if(!_corrfunc.empty()){
       output << std::setw(14) << "<S_i^zS_j^z>"
-             << std::setw(10)  << "error";
+             << std::setw(10) << "error";
     }
     if(!_sqarcorr.empty()){
       output << std::setw(13) << "<(S_i^z)^2>"
-             << std::setw(10)  << "error";
+             << std::setw(10) << "error";
     }
     if(!_spinavrg.empty()){
-      output << std::setw(9) << "<S_i^z>"
+      output << std::setw(9)  << "<S_i^z>"
              << std::setw(10) << "error";
     }
     if(!_strgcorr.empty()){
       output << std::setw(22) << "String Correlations"
-             << std::setw(10)  << "error";
+             << std::setw(10) << "error";
     }
     output << '\n';
-    output << std::setw(98) << std::setfill('-') << "-" << '\n';
+    output << std::setw(104) << std::setfill('-') << "-" << '\n';
     output << std::setfill(' ');
     for(unsigned int i=0; i<_spinavrg.size(); i++)
     {
@@ -318,13 +322,13 @@ namespace SSE
           output << std::setw(14) << std::fixed  
                                   << std::setprecision(3) 
                                   << _corrfunc[i].ave()
-                << std::setw(10)  << std::scientific
+                 << std::setw(10) << std::scientific
                                   << std::setprecision(1)
                                   << _corrfunc[i].err();
         }
         else{
           output << std::setw(15) << " " 
-                 << std::setw(10)  << " ";
+                 << std::setw(10) << " ";
         }
       }
       if(!_sqarcorr.empty()){
@@ -366,7 +370,7 @@ namespace SSE
         }
         else{
           output << std::setw(22) << " " 
-                 << std::setw(10)  << " ";
+                 << std::setw(10) << " ";
         }
       }
       output << '\n';
