@@ -8,9 +8,8 @@ using namespace std;
 
 int main()
 {
-
-  int N = 8;
-  SSE::CONFIG testconf(N, 0.04, 0.0, 0.01, true);
+  int N = 2;
+  SSE::CONFIG testconf(N, 1, 0.0, 0.01, true);
   SSE::PROBE  probe(testconf, 
                     M_PI,
                     true,     // measure energy
@@ -21,21 +20,15 @@ int main()
                     true,     // measure spin averages
                     true      // measure string correlations
                     );
-  /* 
   testconf.diagupdt();
   testconf.loopupdt();
-  testconf.disp_config();
-  cout << "---------------------------------" << endl;
+  testconf.disp_config(); 
+  std::cout << " --- " << std::endl;
   testconf.diagupdt();
   testconf.loopupdt();
-  testconf.disp_config();
-  cout << "---------------------------------" << endl;
-  testconf.diagupdt();
-  testconf.loopupdt();
-  testconf.disp_config();
-  cout << "---" << endl; 
-  probe(testconf);
-  */
+  testconf.disp_config(); 
+  std::cout << " --- " << std::endl;
+  /*
   for(int i=0; i<10000; i++)
   {
     testconf.diagupdt();
@@ -55,5 +48,6 @@ int main()
   }
   cout << "simulation complete" << endl;
   probe.output_to_file("./testoutput.dat");
+  */
   return 0;
 }

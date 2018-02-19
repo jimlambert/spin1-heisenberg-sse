@@ -253,6 +253,7 @@ namespace SSE
     }
     */
     
+    // create temporary list to store changes to vertex list 
     std::vector<int> newvrts;
     for(unsigned int i=0; i<_vtlst.size(); i++)
       newvrts.push_back(_vtlst[i]);
@@ -266,34 +267,54 @@ namespace SSE
         int e = _rleg(_mteng);
         int v0 = 4 * p + 1 + e;
         int vc = v0;
-        int ud;
+        int ud, ut = _rud(_mteng);
         // determine the initial direction of the spin flip
         if(verts[newvrts[p]-1][e] == 0)      ud = _rud(_mteng);
         else if(verts[newvrts[p]-1][e] == 1) ud = 0;
         else                                 ud = 1;
-        do
-        { 
-          // generate a random number here
-          double r = _rdist(_mteng);
-          int x=e;
-          int ind = _prbindex(e, newvrts[(vc-1)/4], ud);
-          // choose exit leg
-          for(int i=0; i<4; i++)
+
+        // If spin is 1 or -1, determine whether or not to flip spin by one or
+        // two increments of spin
+        if((abs(verts[newvrts[p]-1][e]) == 1) && ut == 1){
+          do
           {
-            if(r<_extprbs[ind][i])
-            {
-              x=i; 
-              break;
+            int x, eside = e % 2;
+            int xindx;
+            int cvert = newvrts[(vc-1)/4];
+            int nvert = dbouts[cvert-1][eside];
+            if(cvert < 10)      xindx = 0;
+            else if(cvert < 14) xindx = 1;
+            else                xindx = 2;
+            x = dbexts[xindx][e];
+            newvrts[(vc-1)/4] = nvert;
+            vc = linklst[vc - e + x];
+            e  = (vc-1) % 4;
+          }while(linklst[vc] != v0);
+        }
+        else{
+          do
+          { 
+            // generate a random number here
+            double r = _rdist(_mteng);
+            int x=e;
+            int ind = _prbindex(e, newvrts[(vc-1)/4], ud);
+            // choose exit leg
+            for(int i=0; i<4; i++){
+              if(r<_extprbs[ind][i]){
+                x=i; 
+                break;
+              }
             }
-          }
-          if((e+x==5)||(e+x==1)) ud = ud^1;
-          if(x==e)               ud = ud^1;
-          // change vertex 
-          newvrts[(vc-1)/4] = _outvrts[ind][x];
-          // move to new leg
-          vc = linklst[vc - e + x];
-          e = (vc-1) % 4;
-        }while(linklst[vc] != v0);
+            // determine if spin flip is up or down.
+            if((e+x==5)||(e+x==1)) ud = ud^1;
+            if(x==e)               ud = ud^1;
+            // change vertex 
+            newvrts[(vc-1)/4] = _outvrts[ind][x];
+            // move to new leg
+            vc = linklst[vc - e + x];
+            e = (vc-1) % 4;
+          }while(linklst[vc] != v0);
+        }
       }
     }
     // commit changes
