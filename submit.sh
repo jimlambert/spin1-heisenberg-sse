@@ -12,5 +12,5 @@ do
   LINE=`sed -n ${i}p "$TABLE"`
   echo ${LINE}
   pwd
-  $LINE
+  eval "$LINE"
 done
