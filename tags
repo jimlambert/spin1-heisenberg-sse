@@ -1,0 +1,119 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+CONFIG	inc/CONFIG.h	/^  class CONFIG$/;"	c	namespace:SSE
+CONFIG	src/CONFIG.cpp	/^  CONFIG::CONFIG(const int& N, const double& T, const double& D, $/;"	f	class:SSE::CONFIG
+CONFIG_H	inc/CONFIG.h	11;"	d
+CPP_FILES	Makefile	/^CPP_FILES = $(wildcard src\/*.cpp)$/;"	m
+CXX	Makefile	/^CXX = g++ $/;"	m
+CXX_FLAGS	Makefile	/^CXX_FLAGS = -std=c++14 -O3 -Wall -Wextra -g -fPIC -lboost_program_options$/;"	m
+INCLUDE	Makefile	/^INCLUDE = -I.\/inc\/$/;"	m
+MAIN	Makefile	/^MAIN = HESSE_S1$/;"	m
+OBJ_FILES	Makefile	/^OBJ_FILES = $(addprefix obj\/, $(notdir $(CPP_FILES:.cpp=.o)))$/;"	m
+OBSERVABLE	inc/OBSERVABLE.h	/^      OBSERVABLE() : _bs(1000), _ind(0), _ave(0.0), _err(0.0){}$/;"	f	class:SSE::OBSERVABLE
+OBSERVABLE	inc/OBSERVABLE.h	/^  class OBSERVABLE$/;"	c	namespace:SSE
+OBSERVABLE_H	inc/OBSERVABLE.h	9;"	d
+PROBE	inc/PROBE.h	/^      PROBE(CONFIG& c,        $/;"	f	class:SSE::PROBE
+PROBE	inc/PROBE.h	/^      PROBE(CONFIG& c, $/;"	f	class:SSE::PROBE
+PROBE	inc/PROBE.h	/^  class PROBE$/;"	c	namespace:SSE
+PROBE_H	inc/PROBE.h	10;"	d
+SSE	inc/CONFIG.h	/^namespace SSE$/;"	n
+SSE	inc/OBSERVABLE.h	/^namespace SSE$/;"	n
+SSE	inc/PROBE.h	/^namespace SSE$/;"	n
+SSE	src/CONFIG.cpp	/^namespace SSE$/;"	n	file:
+SSE	src/PROBE.cpp	/^namespace SSE$/;"	n	file:
+_ave	inc/OBSERVABLE.h	/^      double            _ave;     \/\/ average for OBSERVABLE$/;"	m	class:SSE::OBSERVABLE
+_bc	inc/CONFIG.h	/^      bool              _bc;        \/\/ boundary conditions, PBC=true$/;"	m	class:SSE::CONFIG
+_bc	inc/PROBE.h	/^      bool    _bc;$/;"	m	class:SSE::PROBE
+_binave	inc/OBSERVABLE.h	/^      std::vector<double>  _binave;$/;"	m	class:SSE::OBSERVABLE
+_binerr	inc/OBSERVABLE.h	/^      std::vector<double>  _binerr;$/;"	m	class:SSE::OBSERVABLE
+_bs	inc/OBSERVABLE.h	/^      int               _bs;      \/\/ bin size for the OBSERVABLE$/;"	m	class:SSE::OBSERVABLE
+_bt	inc/CONFIG.h	/^      double            _bt;        \/\/ inverse temperature in units of k_b$/;"	m	class:SSE::CONFIG
+_bt	inc/PROBE.h	/^      double  _bt;$/;"	m	class:SSE::PROBE
+_calcprobs	src/CONFIG.cpp	/^  void CONFIG::_calcprobs()$/;"	f	class:SSE::CONFIG
+_corrfunc	inc/PROBE.h	/^      std::vector<OBSERVABLE<double> > _corrfunc;$/;"	m	class:SSE::PROBE
+_df	inc/CONFIG.h	/^      double            _df;        \/\/ single ion anisotropy term$/;"	m	class:SSE::CONFIG
+_df	inc/PROBE.h	/^      double  _df;$/;"	m	class:SSE::PROBE
+_diagvrtid	inc/CONFIG.h	/^      int _diagvrtid(const int& s1, const int& s2)$/;"	f	class:SSE::CONFIG
+_energy	inc/PROBE.h	/^      OBSERVABLE<double>               _energy;$/;"	m	class:SSE::PROBE
+_ep	inc/CONFIG.h	/^      double            _ep;        \/\/ small parameter to add to weights$/;"	m	class:SSE::CONFIG
+_ep	inc/PROBE.h	/^      double  _ep;$/;"	m	class:SSE::PROBE
+_err	inc/OBSERVABLE.h	/^      double            _err;     \/\/ error in average$/;"	m	class:SSE::OBSERVABLE
+_extprbs	inc/CONFIG.h	/^      double            _extprbs[136][4]; $/;"	m	class:SSE::CONFIG
+_ind	inc/OBSERVABLE.h	/^      int               _ind;     \/\/ current _ind in bin size$/;"	m	class:SSE::OBSERVABLE
+_kval	inc/PROBE.h	/^      double  _kval;$/;"	m	class:SSE::PROBE
+_mcorrfunc	inc/PROBE.h	/^      bool _mcorrfunc  =   false;$/;"	m	class:SSE::PROBE
+_menergy	inc/PROBE.h	/^      bool _menergy    =   false;$/;"	m	class:SSE::PROBE
+_mspinavrg	inc/PROBE.h	/^      bool _mspinavrg  =   false;$/;"	m	class:SSE::PROBE
+_msqarcorr	inc/PROBE.h	/^      bool _msqarcorr  =   false;$/;"	m	class:SSE::PROBE
+_msqarspin	inc/PROBE.h	/^      bool _msqarspin  =   false;$/;"	m	class:SSE::PROBE
+_msqarstrg	inc/PROBE.h	/^      bool _msqarstrg  =   false;$/;"	m	class:SSE::PROBE
+_mstrgcorr	inc/PROBE.h	/^      bool _mstrgcorr  =   false;$/;"	m	class:SSE::PROBE
+_nb	inc/CONFIG.h	/^      int               _nb;        \/\/ number of bonds in lattice$/;"	m	class:SSE::CONFIG
+_nb	inc/PROBE.h	/^      int     _nb;$/;"	m	class:SSE::PROBE
+_no	inc/CONFIG.h	/^      int               _no;        \/\/ current number of operators in lattice$/;"	m	class:SSE::CONFIG
+_ns	inc/CONFIG.h	/^      int               _ns;        \/\/ number of sites in lattice$/;"	m	class:SSE::CONFIG
+_ns	inc/PROBE.h	/^      int     _ns; $/;"	m	class:SSE::PROBE
+_offset	inc/PROBE.h	/^      double  _offset;$/;"	m	class:SSE::PROBE
+_oplst	inc/CONFIG.h	/^      std::vector<int>  _oplst;     \/\/ bonds on which operators act$/;"	m	class:SSE::CONFIG
+_outvrts	inc/CONFIG.h	/^      int               _outvrts[136][4];$/;"	m	class:SSE::CONFIG
+_pi	inc/CONFIG.h	/^      int               _pi;        \/\/ current place in the propagation list$/;"	m	class:SSE::CONFIG
+_prbindex	inc/CONFIG.h	/^      int _prbindex(const int& e, const int& v, const int& ds)$/;"	f	class:SSE::CONFIG
+_rbond	inc/CONFIG.h	/^      std::uniform_int_distribution<>* _rbond;$/;"	m	class:SSE::CONFIG
+_rd	inc/CONFIG.h	/^      std::random_device _rd;$/;"	m	class:SSE::CONFIG
+_sites	inc/CONFIG.h	/^      int*              _sites[2];  \/\/ contains structure of lattice$/;"	m	class:SSE::CONFIG
+_spinavrg	inc/PROBE.h	/^      std::vector<OBSERVABLE<double> > _spinavrg;$/;"	m	class:SSE::PROBE
+_spins	inc/CONFIG.h	/^      int*              _spins;     \/\/ contains spins on each bond site$/;"	m	class:SSE::CONFIG
+_sq	inc/OBSERVABLE.h	/^      type              _sq;      \/\/ total sq for current bin$/;"	m	class:SSE::OBSERVABLE
+_sqarcorr	inc/PROBE.h	/^      std::vector<OBSERVABLE<double> > _sqarcorr;$/;"	m	class:SSE::PROBE
+_sqarspin	inc/PROBE.h	/^      OBSERVABLE<double>               _sqarspin;$/;"	m	class:SSE::PROBE
+_sqarstrg	inc/PROBE.h	/^      OBSERVABLE<double>               _sqarstrg;$/;"	m	class:SSE::PROBE
+_strgcorr	inc/PROBE.h	/^      std::vector<OBSERVABLE<double> > _strgcorr;$/;"	m	class:SSE::PROBE
+_sum	inc/OBSERVABLE.h	/^      type              _sum;     \/\/ total value for current bin$/;"	m	class:SSE::OBSERVABLE
+_vrtid	inc/CONFIG.h	/^      int _vrtid(const int (&spins)[4]) const$/;"	f	class:SSE::CONFIG
+_vtlst	inc/CONFIG.h	/^      std::vector<int>  _vtlst;     \/\/ list of vertex types$/;"	m	class:SSE::CONFIG
+_vwgts	inc/CONFIG.h	/^      double            _vwgts[17]; \/\/ vertex weights needed for updates$/;"	m	class:SSE::CONFIG
+_xo	inc/CONFIG.h	/^      int               _xo;        \/\/ current expansion order of lattice$/;"	m	class:SSE::CONFIG
+ave	inc/OBSERVABLE.h	/^  double OBSERVABLE<type>::ave()$/;"	f	class:SSE::OBSERVABLE
+bc	inc/CONFIG.h	/^      bool bc()     const {return _bc;}$/;"	f	class:SSE::CONFIG
+bt	inc/CONFIG.h	/^      double bt()   const {return _bt;}$/;"	f	class:SSE::CONFIG
+dbexts	inc/CONFIG.h	/^      const int dbexts[3][4] =$/;"	m	class:SSE::CONFIG
+dbouts	inc/CONFIG.h	/^      const int dbouts[17][2] =$/;"	m	class:SSE::CONFIG
+df	inc/CONFIG.h	/^      double df()   const {return _df;}$/;"	f	class:SSE::CONFIG
+diagupdt	src/CONFIG.cpp	/^  void CONFIG::diagupdt()$/;"	f	class:SSE::CONFIG
+disp_config	src/CONFIG.cpp	/^  void CONFIG::disp_config()$/;"	f	class:SSE::CONFIG
+disp_extprbs	src/CONFIG.cpp	/^  void CONFIG::disp_extprbs()$/;"	f	class:SSE::CONFIG
+disp_opers	src/CONFIG.cpp	/^  void CONFIG::disp_opers()$/;"	f	class:SSE::CONFIG
+disp_outvrts	src/CONFIG.cpp	/^  void CONFIG::disp_outvrts(const bool& image)$/;"	f	class:SSE::CONFIG
+disp_spins	src/CONFIG.cpp	/^  void CONFIG::disp_spins()$/;"	f	class:SSE::CONFIG
+disp_vert	src/CONFIG.cpp	/^  void CONFIG::disp_vert(const int& j)$/;"	f	class:SSE::CONFIG
+disp_wgts	src/CONFIG.cpp	/^  void CONFIG::disp_wgts()$/;"	f	class:SSE::CONFIG
+eo	inc/CONFIG.h	/^      double eo()   const {return 1 + _df + _ep;}$/;"	f	class:SSE::CONFIG
+ep	inc/CONFIG.h	/^      double ep()   const {return _ep;}$/;"	f	class:SSE::CONFIG
+err	inc/OBSERVABLE.h	/^  double OBSERVABLE<type>::err()$/;"	f	class:SSE::OBSERVABLE
+expoupdt	src/CONFIG.cpp	/^  void CONFIG::expoupdt()$/;"	f	class:SSE::CONFIG
+loopupdt	src/CONFIG.cpp	/^  void CONFIG::loopupdt()$/;"	f	class:SSE::CONFIG
+main	src/main.cpp	/^int main(int ac, char *av[])$/;"	f
+meas_corrfunc	src/PROBE.cpp	/^  void PROBE::meas_corrfunc(CONFIG& conf)$/;"	f	class:SSE::PROBE
+meas_energy	src/PROBE.cpp	/^  void PROBE::meas_energy(CONFIG& conf)$/;"	f	class:SSE::PROBE
+meas_spinavrg	src/PROBE.cpp	/^  void PROBE::meas_spinavrg(CONFIG& conf)$/;"	f	class:SSE::PROBE
+meas_sqarcorr	src/PROBE.cpp	/^  void PROBE::meas_sqarcorr(CONFIG& conf)$/;"	f	class:SSE::PROBE
+meas_sqarspin	src/PROBE.cpp	/^  void PROBE::meas_sqarspin(CONFIG& conf)$/;"	f	class:SSE::PROBE
+meas_sqarstrg	src/PROBE.cpp	/^  void PROBE::meas_sqarstrg(CONFIG& conf)$/;"	f	class:SSE::PROBE
+meas_strgcorr	src/PROBE.cpp	/^  void PROBE::meas_strgcorr(CONFIG& conf)$/;"	f	class:SSE::PROBE
+nb	inc/CONFIG.h	/^      int nb()      const {return _nb;}$/;"	f	class:SSE::CONFIG
+no	inc/CONFIG.h	/^      int no()      const {return _no;}$/;"	f	class:SSE::CONFIG
+ns	inc/CONFIG.h	/^      int ns()      const {return _ns;}$/;"	f	class:SSE::CONFIG
+op	inc/CONFIG.h	/^      int op(int p) const {return _vtlst[p];}$/;"	f	class:SSE::CONFIG
+operator ()	inc/PROBE.h	/^      void operator()(CONFIG& c)$/;"	f	class:SSE::PROBE
+operator []	inc/CONFIG.h	/^      int operator[](const int i) const{return _spins[i];}$/;"	f	class:SSE::CONFIG
+output_to_file	src/PROBE.cpp	/^  void PROBE::output_to_file(const std::string& ofile)$/;"	f	class:SSE::PROBE
+propagate	src/CONFIG.cpp	/^  void CONFIG::propagate()$/;"	f	class:SSE::CONFIG
+push_back	inc/OBSERVABLE.h	/^  void OBSERVABLE<type>::push_back(const type& val)$/;"	f	class:SSE::OBSERVABLE
+types	inc/CONFIG.h	/^      const bool types[17] = $/;"	m	class:SSE::CONFIG
+verts	inc/CONFIG.h	/^      const int verts[17][4] = $/;"	m	class:SSE::CONFIG
+xo	inc/CONFIG.h	/^      int xo()      const {return _xo;}$/;"	f	class:SSE::CONFIG
+~CONFIG	src/CONFIG.cpp	/^  CONFIG::~CONFIG()$/;"	f	class:SSE::CONFIG

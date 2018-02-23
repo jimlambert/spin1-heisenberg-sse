@@ -56,8 +56,7 @@ namespace SSE
     // O.D. represents the off diagonal term. 
     double C = 1 + _df + _ep;
       
-    for(unsigned int i=0; i<17; i++)
-    {
+    for(unsigned int i=0; i<17; i++){
       if(types[i])                      // diagonal
       {
         int s1=verts[i][0], s2 = verts[i][1];
@@ -268,17 +267,18 @@ namespace SSE
         int v0 = 4 * p + 1 + e;
         int vc = v0;
         int ud, ut = _rud(_mteng);
-        // determine the initial direction of the spin flip
+        // Determine the initial direction of the spin flip
         if(verts[newvrts[p]-1][e] == 0)      ud = _rud(_mteng);
         else if(verts[newvrts[p]-1][e] == 1) ud = 0;
         else                                 ud = 1;
 
         // If spin is 1 or -1, determine whether or not to flip spin by one or
         // two increments of spin
-        if((abs(verts[newvrts[p]-1][e]) == 1) && ut == 10){
+        if((abs(verts[newvrts[p]-1][e]) == 1 && ut == 10)){
           do
           {
-            int x, eside = e % 2;
+            int x; 
+            int eside = e % 2;
             int xindx;
             int cvert = newvrts[(vc-1)/4];
             int nvert = dbouts[cvert-1][eside];
@@ -286,10 +286,17 @@ namespace SSE
             else if(cvert < 14) xindx = 1;
             else                xindx = 2;
             x = dbexts[xindx][e];
+            //std::cout << "prop index: " << (vc-1)/4 << std::endl;
+            //std::cout << "entrance leg: " << e << std::endl;
+            //std::cout << "current vert: " << cvert << std::endl;
+            //std::cout << "exit leg: " << x << std::endl;
+            //std::cout << "newvert:  " << nvert << std::endl;
+            //std::cout << "---" << std::endl;
             newvrts[(vc-1)/4] = nvert;
             vc = linklst[vc - e + x];
             e  = (vc-1) % 4;
-          }while(linklst[vc] != v0);
+          }while(vc != v0);
+          //std::cout << "===" << std::endl;
         }
         else{
           do
@@ -313,7 +320,7 @@ namespace SSE
             // move to new leg
             vc = linklst[vc - e + x];
             e = (vc-1) % 4;
-          }while(linklst[vc] != v0);
+          }while(vc != v0);
         }
       }
     }
@@ -441,7 +448,7 @@ namespace SSE
       {
         std::cout << '\t';
       }
-      std::cout << _vtlst[p] << std::endl;
+      std::cout << "[" << p << "] " << _vtlst[p] << std::endl;
       disp_spins();
     }
   }

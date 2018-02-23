@@ -1,4 +1,5 @@
 #include <iostream>
+#include <iomanip>
 #include <cmath>
 #include <string>
 #include <boost/program_options.hpp>
@@ -75,12 +76,12 @@ int main(int ac, char *av[])
     {
       cout << "missing D-field, using default: " << d << endl;
     }
-    if(vm.count("eps")) e = vm["eps"].as<int>();
+    if(vm.count("eps")) e = vm["eps"].as<double>();
     else
     {
       cout << "missing epsilon, using default: " << e << endl;
     }
-    if(vm.count("pbc")) pbc = vm["pbc"].as<int>();
+    if(vm.count("pbc")) pbc = vm["pbc"].as<bool>();
     else
     {
       cout << "missing boundary conditions, using default: " << pbc << endl;
@@ -102,16 +103,11 @@ int main(int ac, char *av[])
                     true,     // measure self correlations
                     true,     // measure spin averages
                     true      // measure string correlations
-                    );
-  /*
+                   );
+  /* 
   testconf.diagupdt();
   testconf.loopupdt();
-  testconf.disp_config(); 
-  std::cout << " --- " << std::endl;
-  testconf.diagupdt();
-  testconf.loopupdt();
-  testconf.disp_config(); 
-  std::cout << " --- " << std::endl;
+  testconf.disp_config();
   */
   for(int i=0; i<equil; i++)
   {
@@ -126,7 +122,6 @@ int main(int ac, char *av[])
   {
     testconf.diagupdt();
     testconf.loopupdt();
-    testconf.expoupdt();
     probe(testconf);
     cout << (int)((double)i/((double)simul)*100) << " %" << '\r' << flush;
   }
