@@ -10,10 +10,9 @@ import sys
 import argparse
 
 def main(argv):
-
     parser = argparse.ArgumentParser(description='Produce run table')
     parser.add_argument('--tablename', type=str, dest='table',
-                        default='runtable.txt',
+                        default='runtable.dat',
                         help='name of run table')
     parser.add_argument('--sizerng', nargs='+', type=int, dest='sizerng',
                         help='range of sizes')
@@ -29,7 +28,7 @@ def main(argv):
                         help='epsilon value')
     parser.add_argument('--pbc', type=bool, dest='pbc', default=True,
                         help='boundary conditions')
-    parser.add_argument('--odir', type=str, dest='odir', default="~/data/",
+    parser.add_argument('--odir', type=str, dest='odir', default="./",
                         help='default directory for data output')
     
     args = parser.parse_args()
@@ -43,7 +42,7 @@ def main(argv):
     for s in aSizes:
         for t in aTemps:
             for d in aDflds:
-                cmdstr = "./HESSE_1D "
+                cmdstr = "./HESSE_S1 "
                 cmdstr += "--size "  + str(s) + " "
                 cmdstr += "--equil " + str(args.es) + " "
                 cmdstr += "--simul " + str(args.ss) + " "
@@ -54,19 +53,15 @@ def main(argv):
                     cmdstr += "--pbc " + str(1) + " "
                 else: 
                     cmdstr += "--pbc " + str(0) + " "
-                ofilename = args.odir
+                ofilename = args.odir + "ssedata"
                 ofilename += "-" + str(s) + "-" + str(t)
                 if d >= 0.0:
                     ofilename += "-" + str(0)
                 else:
                     ofilename += "-" + str(1)
-                ofilename += "-" + str(abs(d))
+                ofilename += "-" + str(abs(d)) + ".dat"
                 cmdstr += "--of " + ofilename
-                rtable.write(cmdstr + '\n')
-
-    
-                
-     
+                rtable.write(cmdstr + '\n') 
     return 0
 
 if __name__=='__main__':
