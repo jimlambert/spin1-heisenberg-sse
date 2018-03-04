@@ -97,12 +97,12 @@ int main(int ac, char *av[])
   SSE::PROBE  probe(testconf, 
                     M_PI,
                     true,     // measure energy
-                    true,     // measure square of string correlator
+                    false,     // measure square of string correlator
                     true,     // measure average of square of sum
                     true,     // measure S_z correlator
                     true,     // measure self correlations
                     true,     // measure spin averages
-                    true      // measure string correlations
+                    false      // measure string correlations
                    );
   /* 
   testconf.diagupdt();
