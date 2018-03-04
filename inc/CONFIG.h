@@ -40,6 +40,7 @@ namespace SSE
       // single spin flip loop update
       int               _outvrts[136][4];
       double            _extprbs[136][4]; 
+      double            _dbfprbs[2];
 
       // seed random number generator and initialize distributions
       std::random_device _rd;

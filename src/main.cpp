@@ -104,11 +104,14 @@ int main(int ac, char *av[])
                     true,     // measure spin averages
                     true      // measure string correlations
                    );
-  /* 
-  testconf.diagupdt();
-  testconf.loopupdt();
-  testconf.disp_config();
-  */
+  //testconf.diagupdt();
+  //testconf.disp_config();
+  //testconf.loopupdt();
+  //testconf.disp_config();
+  //testconf.diagupdt();
+  //testconf.loopupdt();
+  //testconf.disp_config();
+  
   for(int i=0; i<equil; i++)
   {
     testconf.diagupdt();
@@ -127,6 +130,5 @@ int main(int ac, char *av[])
   }
   cout << "simulation complete" << endl;
   probe.output_to_file(ofile);
-  
   return 0;
 }

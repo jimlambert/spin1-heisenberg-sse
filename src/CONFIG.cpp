@@ -66,7 +66,14 @@ namespace SSE
     } 
     
     // populate look-up table for transition probabilities
-    _calcprobs(); 
+    _calcprobs();
+    
+    // for the double flip update we need the transition probability between the
+    // ferromagnetic and antiferromagnetic vertices. This is achieved with a
+    // heat bath algorithm.
+    double tot = _vwgts[6] + _vwgts[7];
+    _dbfprbs[0] = _vwgts[6] / tot;
+    _dbfprbs[1] = _vwgts[7] / tot;
   }
   
   CONFIG::~CONFIG()
@@ -274,7 +281,7 @@ namespace SSE
 
         // If spin is 1 or -1, determine whether or not to flip spin by one or
         // two increments of spin
-        if((abs(verts[newvrts[p]-1][e]) == 1 && ut == 10)){
+        if((abs(verts[newvrts[p]-1][e]) == 1 && ut == 1)){
           do
           {
             int x; 
@@ -282,15 +289,39 @@ namespace SSE
             int xindx;
             int cvert = newvrts[(vc-1)/4];
             int nvert = dbouts[cvert-1][eside];
-            if(cvert < 10)      xindx = 0;
-            else if(cvert < 14) xindx = 1;
-            else                xindx = 2;
-            x = dbexts[xindx][e];
+            // If a ferromagnetic or anti ferromagnetic element is selected we
+            // need to give the system a chance to bounce back
+            if((cvert == 6) || (cvert == 7))
+            {
+              double r = _rdist(_mteng);
+              if(r < _dbfprbs[1]) x = dbexts[0][e];
+              else{
+                x = e;
+                nvert = cvert;
+              }               
+            }
+            else if((cvert == 8) || (cvert == 9))
+            {
+              double r = _rdist(_mteng);
+              if(r < _dbfprbs[0]) x = dbexts[0][e];
+              else{
+                x = e;
+                nvert = cvert;
+              }
+            }
+            else
+            { 
+              if(cvert < 10)      xindx = 0;
+              else if(cvert < 14) xindx = 1;
+              else                xindx = 2;
+              x = dbexts[xindx][e];
+            }
             //std::cout << "prop index: " << (vc-1)/4 << std::endl;
             //std::cout << "entrance leg: " << e << std::endl;
             //std::cout << "current vert: " << cvert << std::endl;
             //std::cout << "exit leg: " << x << std::endl;
             //std::cout << "newvert:  " << nvert << std::endl;
+            //std::cout << "v0: "       << v0 << std::endl;
             //std::cout << "---" << std::endl;
             newvrts[(vc-1)/4] = nvert;
             vc = linklst[vc - e + x];
