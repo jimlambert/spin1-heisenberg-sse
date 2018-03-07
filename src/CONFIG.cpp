@@ -281,7 +281,7 @@ namespace SSE
 
         // If spin is 1 or -1, determine whether or not to flip spin by one or
         // two increments of spin
-        if((abs(verts[newvrts[p]-1][e]) == 1 && ut == 1)){
+        if((abs(verts[newvrts[p]-1][e]) == 1 && ut == 10)){
           do
           {
             int x; 
