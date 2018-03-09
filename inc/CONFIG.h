@@ -39,7 +39,12 @@ namespace SSE
       // lookup tables for exit vertices and exit probability bounds for the
       // single spin flip loop update
       int               _outvrts[136][4];
-      double            _extprbs[136][4]; 
+      double            _extprbs[136][4];
+
+      // look up tables for exit vertices and exit probability boudns for the
+      // double spin flip loop update
+      int               _doutvrts[68][4];
+      double            _dextprbs[68][4]; 
       double            _dbfprbs[2];
 
       // seed random number generator and initialize distributions
@@ -57,7 +62,13 @@ namespace SSE
       // vertex, and a change type. Function is ideally inlined
       int _prbindex(const int& e, const int& v, const int& ds)
       {
-        return e + ((v - 1) * 8) + 4*ds;
+        return e + ((v - 1) * 8) + 4 * ds;
+      }
+
+      // same as above but now for the double spin flips
+      int _dprbindex(const int& e, const int& v)
+      {
+        return e + ((v - 1) * 4);
       }
 
       // given four spins, returns the corresponding vertex id. Also inlined

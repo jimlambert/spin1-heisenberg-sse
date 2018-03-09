@@ -94,6 +94,7 @@ namespace SSE
       for(unsigned int i=0; i<4; i++){
         for(unsigned int o=0; o<4; o++)
         {
+          // single flip update ------------------------------------------------
           int vspu[4] = {verts[ref][0], verts[ref][1], 
                          verts[ref][2], verts[ref][3]};
           int vspd[4] = {verts[ref][0], verts[ref][1], 
@@ -106,16 +107,25 @@ namespace SSE
           if((i<2 && o<2) || (i>1 && o>1)) vspd[o] = vspd[o] + 1;
           else                             vspd[o] = vspd[o] - 1;
           _outvrts[_prbindex(i, ref+1, 0)][o] = _vrtid(vspd);
+
+          // double flip update ------------------------------------------------
+          vsp[4] = {verts[ref][0], verts[ref][1], 
+                    verts[ref][2], verts[ref][3]}
+          if     (vsp[o] == 1)  vsp[o] = vsp[o] - 2;
+          else if(vsp[o] == -1) vsp[o] = vsp[o] + 2;
+          if     (vsp[i] == 1)  vsp[i] = vsp[i] - 2;
+          else if(vsp[i] == -1) vsp[i] = vsp[i] + 2;
+          _outvrts[_dprbindex(i, ref+1)][o] = _vrtid(vsp);
         }
       }
     }
-    // now we determine transition probabilities and bounds
+    // single flip update ------------------------------------------------------
     for(unsigned int row=0; row<136; row++)
     {
       int x;                        // exit leg index
       double den = 0.0;             // denominator for heatbath calculation  
       double sum = 0.0;             // used to calculate probability bounds
-      std::vector<double> temp;     // temporary array to store porbabilies
+      std::vector<double> temp;     // temporary array to store probabilities
       temp.resize(4, 0.0);
       for(x=0; x<4; x++) den += _vwgts[_outvrts[row][x]-1];      
       for(x=0; x<4; x++)
@@ -123,7 +133,6 @@ namespace SSE
         if(_outvrts[row][x] == 0) temp[x] = 0.0;
         else temp[x] = _vwgts[_outvrts[row][x]-1] / den;
       }
-
       int lstval = 0;
       // convert these probabilities to bounds
       for(x=0; x<4; x++)
@@ -135,12 +144,40 @@ namespace SSE
           lstval = x;
           _extprbs[row][x] = sum;
         }         
-        // guarentee that last non-zero bound is 1. 
       }  
       _extprbs[row][lstval] = 1.0;
     }
+    
+    // double flip update ------------------------------------------------------
+    for(unsigned int row=0; row<68; row++)
+    {
+      int x;                        // exit leg index
+      double den = 0.0;             // denominator for heatbath calculation  
+      double sum = 0.0;             // used to calculate probability bounds
+      std::vector<double> temp;     // temporary array to store probabilities
+      temp.resize(4, 0.0);
+      for(x=0; x<4; x++) den += _vwgts[_outvrts[row][x]-1];
+      for(x=0; x<4; x++)
+      {
+        if(_outvrts[row][x] == 0) temp[x] = 0.0;
+        else temp[x] = _vwgts[_outvrts[row][x]-1] / den;
+      }
+      int lstval = 0;
+      // convert probabilities to bounds
+      for(x=0; x<4; x++)
+      {
+        sum += temp[x];
+        if(temp[x] == 0.0) _extprbs[row][x] = 0.0;
+        else
+        {
+          lstval = x;
+          _extprbs[row][x] = sum;
+        }
+      }
+      _extprbs[row][lstval] = 1.0; 
+    }
   }
- 
+
   void CONFIG::expoupdt()
   {
     // called during the equilibration phase. This update increases the total
