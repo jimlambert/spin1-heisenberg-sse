@@ -67,7 +67,6 @@ namespace SSE
     
     // populate look-up table for transition probabilities
     _calcprobs();
-    
     // for the double flip update we need the transition probability between the
     // ferromagnetic and antiferromagnetic vertices. This is achieved with a
     // heat bath algorithm.
@@ -109,13 +108,13 @@ namespace SSE
           _outvrts[_prbindex(i, ref+1, 0)][o] = _vrtid(vspd);
 
           // double flip update ------------------------------------------------
-          vsp[4] = {verts[ref][0], verts[ref][1], 
-                    verts[ref][2], verts[ref][3]}
+          int vsp[4] = {verts[ref][0], verts[ref][1], 
+                        verts[ref][2], verts[ref][3]};
           if     (vsp[o] == 1)  vsp[o] = vsp[o] - 2;
           else if(vsp[o] == -1) vsp[o] = vsp[o] + 2;
           if     (vsp[i] == 1)  vsp[i] = vsp[i] - 2;
           else if(vsp[i] == -1) vsp[i] = vsp[i] + 2;
-          _outvrts[_dprbindex(i, ref+1)][o] = _vrtid(vsp);
+          _doutvrts[_dprbindex(i, ref+1)][o] = _vrtid(vsp);
         }
       }
     }
@@ -156,25 +155,25 @@ namespace SSE
       double sum = 0.0;             // used to calculate probability bounds
       std::vector<double> temp;     // temporary array to store probabilities
       temp.resize(4, 0.0);
-      for(x=0; x<4; x++) den += _vwgts[_outvrts[row][x]-1];
+      for(x=0; x<4; x++) den += _vwgts[_doutvrts[row][x]-1];
       for(x=0; x<4; x++)
       {
-        if(_outvrts[row][x] == 0) temp[x] = 0.0;
-        else temp[x] = _vwgts[_outvrts[row][x]-1] / den;
+        if(_doutvrts[row][x] == 0) temp[x] = 0.0;
+        else temp[x] = _vwgts[_doutvrts[row][x]-1] / den;
       }
       int lstval = 0;
       // convert probabilities to bounds
       for(x=0; x<4; x++)
       {
         sum += temp[x];
-        if(temp[x] == 0.0) _extprbs[row][x] = 0.0;
+        if(temp[x] == 0.0) _dextprbs[row][x] = 0.0;
         else
         {
           lstval = x;
-          _extprbs[row][x] = sum;
+          _dextprbs[row][x] = sum;
         }
       }
-      _extprbs[row][lstval] = 1.0; 
+      _dextprbs[row][lstval] = 1.0; 
     }
   }
 
@@ -321,50 +320,20 @@ namespace SSE
         if((abs(verts[newvrts[p]-1][e]) == 1 && ut == 10)){
           do
           {
-            int x; 
-            int eside = e % 2;
-            int xindx;
-            int cvert = newvrts[(vc-1)/4];
-            int nvert = dbouts[cvert-1][eside];
-            // If a ferromagnetic or anti ferromagnetic element is selected we
-            // need to give the system a chance to bounce back
-            if((cvert == 6) || (cvert == 7))
-            {
-              double r = _rdist(_mteng);
-              if(r < _dbfprbs[1]) x = dbexts[0][e];
-              else{
-                x = e;
-                nvert = cvert;
-              }               
-            }
-            else if((cvert == 8) || (cvert == 9))
-            {
-              double r = _rdist(_mteng);
-              if(r < _dbfprbs[0]) x = dbexts[0][e];
-              else{
-                x = e;
-                nvert = cvert;
+            double r = _rdist(_mteng);
+            int x=e;
+            int ind = _dprbindex(e, newvrts[(vc-1)/4]);
+            // choose exit leg
+            for(int i=0; i<4; i++){
+              if(r<_dextprbs[ind][i]){
+                x=i;
+                break;
               }
             }
-            else
-            { 
-              if(cvert < 10)      xindx = 0;
-              else if(cvert < 14) xindx = 1;
-              else                xindx = 2;
-              x = dbexts[xindx][e];
-            }
-            //std::cout << "prop index: " << (vc-1)/4 << std::endl;
-            //std::cout << "entrance leg: " << e << std::endl;
-            //std::cout << "current vert: " << cvert << std::endl;
-            //std::cout << "exit leg: " << x << std::endl;
-            //std::cout << "newvert:  " << nvert << std::endl;
-            //std::cout << "v0: "       << v0 << std::endl;
-            //std::cout << "---" << std::endl;
-            newvrts[(vc-1)/4] = nvert;
+            newvrts[(vc-1)/4] = _doutvrts[ind][x];
             vc = linklst[vc - e + x];
-            e  = (vc-1) % 4;
+            e = (vc-1) % 4;
           }while(vc != v0);
-          //std::cout << "===" << std::endl;
         }
         else{
           do
@@ -408,7 +377,7 @@ namespace SSE
       else _spins[i] = _rspin(_mteng);    // generate new spin
     }
   }
-  
+ 
   void CONFIG::propagate()
   {
     if(_vtlst[_pi] == 0)

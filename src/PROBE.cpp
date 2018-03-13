@@ -175,7 +175,7 @@ namespace SSE
         int index = 0;
         for(int i=initial; i<max; i++)
         {
-          temp[index] += conf[i];
+          temp[index] += abs(conf[i]);
           index++;
         }
         conf.propagate();
@@ -195,7 +195,7 @@ namespace SSE
         int index=0;
         for(int i=initial; i<max; i++)
         {
-          temp[index] += conf[i];
+          temp[index] += abs(conf[i]);
           index++;
         }
         conf.propagate();
