@@ -60,7 +60,7 @@ namespace SSE
       _sum += val;
       _sq  += val*val; 
       double a = (double)_sum / (double)_bs;
-      double e = ((double)_sq/(double)_bs) - a*a;
+      double e = std::sqrt((((double)_sq/(double)_bs) - a*a)/(double)_bs);
       _binave.push_back(a);
       _binerr.push_back(e);
       _ind = 0;

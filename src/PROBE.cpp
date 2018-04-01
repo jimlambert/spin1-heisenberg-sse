@@ -66,7 +66,7 @@ namespace SSE
     int initial;
     if(_bc){  // PBC
       initial = 0;
-      max = _ns;
+      max = _ns / 2 + 1;
     } 
     else{     // OBC
       initial = _ns /2;
@@ -116,7 +116,7 @@ namespace SSE
     int initial;
     if(_bc){  // PBC
       initial = 0;
-      max = _ns;
+      max = _ns / 2 + 1;
     } 
     else{     // OBC
       initial = _ns /2;
@@ -161,7 +161,7 @@ namespace SSE
     int initial;
     if(_bc){  // PBC
       initial = 0;
-      max = _ns;
+      max = _ns / 2 + 1;
     } 
     else{     // OBC
       initial = _ns /2;
@@ -274,20 +274,20 @@ namespace SSE
     else    output << std::setw(9) << "open"     << '\n';
     output << std::setw(104) << std::setfill('-') << "-" << '\n';
     output << std::setfill(' ');
-    output << std::setw(88) << std::left << "energy:" 
-           << std::setw(8) << std::setprecision(3) 
+    output << std::setw(78) << std::left << "energy:" 
+           << std::setw(18) << std::setprecision(3) 
            << std::fixed << _energy.ave() 
            << std::setw(8) << std::setprecision(1) 
            << std::scientific << _energy.err()  
            << '\n';
-    output << std::setw(88) << std::left << "string corr. squared:"
-           << std::setw(8) << std::setprecision(3) 
+    output << std::setw(78) << std::left << "string corr. squared:"
+           << std::setw(18) << std::setprecision(3) 
            << std::fixed << _sqarstrg.ave() 
-           << std::setw(8) << std::setprecision(1) 
+           << std::setw(18) << std::setprecision(1) 
            << std::scientific << _sqarstrg.err()
            << '\n';
-    output << std::setw(88) << "staggered mag. squared:" 
-           << std::setw(8) << std::setprecision(3) 
+    output << std::setw(78) << "staggered mag. squared:" 
+           << std::setw(18) << std::setprecision(3) 
            << std::fixed << _sqarspin.ave()
            << std::setw(8) << std::setprecision(1) 
            << std::scientific << _sqarspin.err()
