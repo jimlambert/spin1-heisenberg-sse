@@ -2,6 +2,7 @@
 #include <iomanip>
 #include <cmath>
 #include <string>
+#include <random>
 #include <boost/program_options.hpp>
 #include "CONFIG.h"
 #include "PROBE.h"
@@ -104,13 +105,6 @@ int main(int ac, char *av[])
                     true,     // measure spin averages
                     false      // measure string correlations
                    );
-  //testconf.diagupdt();
-  //testconf.disp_config();
-  //testconf.loopupdt();
-  //testconf.disp_config();
-  //testconf.diagupdt();
-  //testconf.loopupdt();
-  //testconf.disp_config();
   
   for(int i=0; i<equil; i++)
   {

@@ -302,7 +302,7 @@ namespace SSE
 
     for(int p=0; p<_xo; p++)
     {
-      if(_oplst[p] == 0) continue;
+      if(_vtlst[p] == 0) continue;
       else
       {
         // Choose starting leg
