@@ -15,6 +15,14 @@ namespace SSE
     double val = (-1.0/_bt)*(conf.no()) + _ns*_offset;
     _energy.push_back(val);
   }
+  
+  void PROBE::meas_nave(CONFIG& c){
+    _nave.push_back(c.no());
+  }
+
+  void PROBE::meas_nsquared(CONFIG& c){
+    _nsquared.push_back(c.no()*c.no());
+  }
 
   void PROBE::meas_sqarstrg(CONFIG& conf)
   {
@@ -277,6 +285,13 @@ namespace SSE
     output << std::setw(78) << std::left << "energy:" 
            << std::setw(18) << std::setprecision(3) 
            << std::fixed << _energy.ave() 
+           << std::setw(8) << std::setprecision(1) 
+           << std::scientific << _energy.err()  
+           << '\n';
+    output << std::setw(78) << std::left << "specific heat:" 
+           << std::setw(18) << std::setprecision(3) 
+           << std::fixed 
+           << (_nsquared.ave() - _nave.ave()*_nave.ave() - _nave.ave())/6 
            << std::setw(8) << std::setprecision(1) 
            << std::scientific << _energy.err()  
            << '\n';

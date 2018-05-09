@@ -40,6 +40,8 @@ namespace SSE
       bool _mstrgcorr  =   false;
 
       OBSERVABLE<double>               _energy;
+      OBSERVABLE<double>               _nave;
+      OBSERVABLE<double>               _nsquared;
       OBSERVABLE<double>               _sqarstrg;
       OBSERVABLE<double>               _sqarspin;
       std::vector<OBSERVABLE<double> > _corrfunc;
@@ -86,6 +88,8 @@ namespace SSE
                _mstrgcorr(G){}
      
       void meas_energy(CONFIG&);
+      void meas_nave(CONFIG&);
+      void meas_nsquared(CONFIG&);
       void meas_sqarstrg(CONFIG&);
       void meas_sqarspin(CONFIG&);
       void meas_corrfunc(CONFIG&);
@@ -98,6 +102,8 @@ namespace SSE
       void operator()(CONFIG& c)
       {
         if(_menergy)   meas_energy(c);
+        meas_nave(c);
+        meas_nsquared(c);
         if(_msqarstrg) meas_sqarstrg(c);
         if(_msqarspin) meas_sqarspin(c);
         if(_mcorrfunc) meas_corrfunc(c);
