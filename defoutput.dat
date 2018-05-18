@@ -4,13 +4,17 @@ d-field:                                                                        
 beta:                                                                                              10   
 boundary conditions:                                                                           periodic 
 --------------------------------------------------------------------------------------------------------
-energy:                                                                       -6.004            9.7e-03 
-specific heat:                                                                -1.541            9.7e-03 
-string corr. squared:                                                         -nan              -nan              
-staggered mag. squared:                                                       1.574             2.5e-02 
+energy:                                                                       -6.014            1.4e-02 
+specific heat:                                                                -0.199            1.4e-02 
+staggered mag. susceptibility:                                                0.00837           2.2e-05 
+staggered mag. fluctuations:                                                  1.60764           4.1e-03 
+string order susceptibility:                                                  0.01484           2.0e-05 
+string order fluctuations:                                                    2.84951           3.9e-03 
+staggered magnetization:                                                      -0.01703          1.4e-02 
+string order:                                                                 2.08584           4.3e-03 
 --------------------------------------------------------------------------------------------------------
-Site  <S_i^zS_j^z>  error     <(S_i^z)^2>  error     <S_i^z>  error     
+Site  <S_i^zS_j^z>  error     
 --------------------------------------------------------------------------------------------------------
-0     0.665         9.5e-04   0.665        9.5e-04   0.665    9.5e-04   
-1     -0.497        1.0e-03   0.666        1.0e-03   0.666    1.0e-03   
-2     0.331         1.4e-03   0.665        9.6e-04   0.665    9.6e-04   
+0     0.666         1.1e-03   
+1     -0.499        1.5e-03   
+2     0.333         1.5e-03   

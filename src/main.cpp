@@ -120,6 +120,7 @@ int main(int ac, char *av[])
     testconf.diagupdt();
     testconf.loopupdt();
     probe(testconf);
+    probe.meas_qvar(testconf);
     cout << (int)((double)i/((double)simul)*100) << " %" << '\r' << flush;
   }
   cout << "simulation complete" << endl;

@@ -42,12 +42,19 @@ namespace SSE
       OBSERVABLE<double>               _energy;
       OBSERVABLE<double>               _nave;
       OBSERVABLE<double>               _nsquared;
-      OBSERVABLE<double>               _sqarstrg;
       OBSERVABLE<double>               _sqarspin;
+      OBSERVABLE<double>               _smsusc;
+      OBSERVABLE<double>               _smfluc;
+      OBSERVABLE<double>               _sosusc;
+      OBSERVABLE<double>               _sofluc;
+      OBSERVABLE<double>               _sm;
+      OBSERVABLE<double>               _so;
       std::vector<OBSERVABLE<double> > _corrfunc;
-      std::vector<OBSERVABLE<double> > _sqarcorr;
-      std::vector<OBSERVABLE<double> > _spinavrg;
-      std::vector<OBSERVABLE<double> > _strgcorr;
+
+      int sfac(int i){
+        if(i%2 == 0) return 1;
+        else return -1;
+      }
 
     public:
 
@@ -90,12 +97,8 @@ namespace SSE
       void meas_energy(CONFIG&);
       void meas_nave(CONFIG&);
       void meas_nsquared(CONFIG&);
-      void meas_sqarstrg(CONFIG&);
-      void meas_sqarspin(CONFIG&);
+      void meas_qvar(CONFIG&);
       void meas_corrfunc(CONFIG&);
-      void meas_sqarcorr(CONFIG&);
-      void meas_spinavrg(CONFIG&);
-      void meas_strgcorr(CONFIG&);
 
       void output_to_file(const std::string&);
       
@@ -104,12 +107,7 @@ namespace SSE
         if(_menergy)   meas_energy(c);
         meas_nave(c);
         meas_nsquared(c);
-        if(_msqarstrg) meas_sqarstrg(c);
-        if(_msqarspin) meas_sqarspin(c);
         if(_mcorrfunc) meas_corrfunc(c);
-        if(_msqarcorr) meas_sqarcorr(c);
-        if(_mspinavrg) meas_spinavrg(c);
-        if(_mstrgcorr) meas_strgcorr(c);
       }
   };
 }

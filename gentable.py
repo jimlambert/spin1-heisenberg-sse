@@ -49,11 +49,13 @@ def main(argv):
                 cmdstr += "--temp "  + str(t) + " "
                 cmdstr += "--dfld "  + str(d) + " "
                 cmdstr += "--eps "   + str(args.eps) + " "
+                ofilename = args.odir + "ssedata"
                 if(args.pbc):
                     cmdstr += "--pbc " + str(1) + " "
+                    ofilename += "-pbc"
                 else: 
                     cmdstr += "--pbc " + str(0) + " "
-                ofilename = args.odir + "ssedata"
+                    ofilename += "-obc"
                 ofilename += "-" + str(s) + "-" + str(t)
                 if d >= 0.0:
                     ofilename += "-" + str(0)
