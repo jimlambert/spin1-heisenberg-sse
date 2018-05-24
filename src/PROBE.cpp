@@ -4,6 +4,7 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <cstdlib>
 #include "OBSERVABLE.h"
 #include "CONFIG.h"
 #include "PROBE.h"
@@ -38,9 +39,11 @@ namespace SSE
         double sotot = 0.0;
         int sptot = 0.0;
         for(int i=0; i<c.ns(); i++){
-          sctot += 0.5*sfac(i)*c[i];
-          sotot += c[0]*c[i]*sfac(sptot);
-          sptot += c[i];
+          sctot += sfac(i)*c[i];
+          if(i>1 && i < c.ns()/2) sptot += c[i];
+          if(i==c.ns()/2){
+            sotot += c[0]*c[i]*sfac(sptot);
+          }
         }
         smsc += sctot;
         smsq += sctot*sctot;
@@ -52,14 +55,14 @@ namespace SSE
     }
     _sm.push_back(smsc/meascount);
     _so.push_back(sosc/meascount);
-    double smval = c.bt()/(meascount*(meascount+1))*smsc*smsc 
-                 + c.bt()/(meascount*(meascount+1))*smsq;
-    _smsusc.push_back(smval-c.bt()*(smsc*smsc/(meascount*meascount)));
-    _smfluc.push_back(smsq/(meascount) - (smsc*smsc)/((meascount)*(meascount)));   
-    double soval = c.bt()/(meascount*(meascount+1))*sosc*sosc
-                 + c.bt()/(meascount*(meascount+1))*sosq;
-    _sosusc.push_back(soval-c.bt()*(sosc*sosc/(meascount*meascount)));
-    _sofluc.push_back(sosq/meascount - (sosc*sosc)/(meascount*meascount));
+    _smsq.push_back(smsq/meascount);
+    _sosq.push_back(sosq/meascount);
+    double smval = c.bt()/(meascount*(meascount+1.0))*smsc*smsc 
+                 + c.bt()/((meascount+1)*(meascount+1.0))*smsq;
+    _smsusc.push_back(smval);
+    double soval = c.bt()/(meascount*(meascount+1.0))*sosc*sosc
+                 + c.bt()/((meascount+1)*(meascount+1.0))*sosq;
+    _sosusc.push_back(soval);
   }
 
   void PROBE::meas_corrfunc(CONFIG& conf)
@@ -144,15 +147,16 @@ namespace SSE
            << '\n';
     output << std::setw(78) << std::left << "staggered mag. susceptibility:" 
            << std::setw(18) << std::setprecision(5) 
-           << std::fixed << _smsusc.ave()/_bt
+           << std::fixed << _smsusc.ave()/_bt - _sm.ave()*_sm.ave()
            << std::setw(8) << std::setprecision(1) 
            << std::scientific << _smsusc.err()/_bt  
            << '\n';
     output << std::setw(78) << std::left << "staggered mag. fluctuations:" 
            << std::setw(18) << std::setprecision(5) 
-           << std::fixed << _smfluc.ave() 
-           << std::setw(8) << std::setprecision(1) 
-           << std::scientific << _smfluc.err()  
+           << std::fixed << _smsq.ave() - _sm.ave()*_sm.ave()
+           << std::setw(8) << std::setprecision(1)
+           << std::scientific 
+           << std::sqrt(_sm.err()*_sm.err() + _smsq.err()*_smsq.err())  
            << '\n';
     output << std::setw(78) << std::left << "string order susceptibility:" 
            << std::setw(18) << std::setprecision(5) 
@@ -162,9 +166,10 @@ namespace SSE
            << '\n';
     output << std::setw(78) << std::left << "string order fluctuations:" 
            << std::setw(18) << std::setprecision(5) 
-           << std::fixed << _sofluc.ave() 
+           << std::fixed << _sosq.ave()-_so.ave()*_so.ave() 
            << std::setw(8) << std::setprecision(1) 
-           << std::scientific << _sofluc.err()  
+           << std::scientific 
+           << std::sqrt(_so.err()*_so.err() + _sosq.err()*_sosq.err())  
            << '\n';
     output << std::setw(78) << std::left << "staggered magnetization:" 
            << std::setw(18) << std::setprecision(5) 

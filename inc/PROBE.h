@@ -44,11 +44,11 @@ namespace SSE
       OBSERVABLE<double>               _nsquared;
       OBSERVABLE<double>               _sqarspin;
       OBSERVABLE<double>               _smsusc;
-      OBSERVABLE<double>               _smfluc;
       OBSERVABLE<double>               _sosusc;
-      OBSERVABLE<double>               _sofluc;
       OBSERVABLE<double>               _sm;
+      OBSERVABLE<double>               _smsq;
       OBSERVABLE<double>               _so;
+      OBSERVABLE<double>               _sosq;
       std::vector<OBSERVABLE<double> > _corrfunc;
 
       int sfac(int i){
