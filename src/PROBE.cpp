@@ -36,7 +36,9 @@ namespace SSE
     for(int p=0; p<c.xo(); p++){
       if(p % CORR_INT == 0){
         double sctot = 0.0;
+        double sxtot = 0.0;
         double sotot = 0.0;
+        double rtwo = std::sqrt(2);
         int sptot = 0.0;
         for(int i=0; i<c.ns(); i++){
           sctot += sfac(i)*c[i];
@@ -45,7 +47,7 @@ namespace SSE
             sotot += c[0]*c[i]*sfac(sptot);
           }
         }
-        smsc += sctot;
+        smsc += abs(sctot);
         smsq += sctot*sctot;
         sosc += sotot;
         sosq += sotot*sotot; 

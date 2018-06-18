@@ -315,50 +315,29 @@ namespace SSE
         else if(verts[newvrts[p]-1][e] == 1) ud = 0;
         else                                 ud = 1;
 
-        // If spin is 1 or -1, determine whether or not to flip spin by one or
-        // two increments of spin
-        if((abs(verts[newvrts[p]-1][e]) == 1 && ut == 10)){
-          do
-          {
-            double r = _rdist(_mteng);
-            int x=e;
-            int ind = _dprbindex(e, newvrts[(vc-1)/4]);
-            // choose exit leg
-            for(int i=0; i<4; i++){
-              if(r<_dextprbs[ind][i]){
-                x=i;
-                break;
-              }
+        //if(abs(verts[newvrts[p]-1][e])==1 && (0.0 > _rdist(_mteng))) continue;
+        do
+        { 
+          // generate a random number here
+          double r = _rdist(_mteng);
+          int x=e;
+          int ind = _prbindex(e, newvrts[(vc-1)/4], ud);
+          // choose exit leg
+          for(int i=0; i<4; i++){
+            if(r<_extprbs[ind][i]){
+              x=i; 
+              break;
             }
-            newvrts[(vc-1)/4] = _doutvrts[ind][x];
-            vc = linklst[vc - e + x];
-            e = (vc-1) % 4;
-          }while(vc != v0);
-        }
-        else{
-          do
-          { 
-            // generate a random number here
-            double r = _rdist(_mteng);
-            int x=e;
-            int ind = _prbindex(e, newvrts[(vc-1)/4], ud);
-            // choose exit leg
-            for(int i=0; i<4; i++){
-              if(r<_extprbs[ind][i]){
-                x=i; 
-                break;
-              }
-            }
-            // determine if spin flip is up or down.
-            if((e+x==5)||(e+x==1)) ud = ud^1;
-            if(x==e)               ud = ud^1;
-            // change vertex 
-            newvrts[(vc-1)/4] = _outvrts[ind][x];
-            // move to new leg
-            vc = linklst[vc - e + x];
-            e = (vc-1) % 4;
-          }while(vc != v0);
-        }
+          }
+          // determine if spin flip is up or down.
+          if((e+x==5)||(e+x==1)) ud = ud^1;
+          if(x==e)               ud = ud^1;
+          // change vertex 
+          newvrts[(vc-1)/4] = _outvrts[ind][x];
+          // move to new leg
+          vc = linklst[vc - e + x];
+          e = (vc-1) % 4;
+        }while(vc != v0);
       }
     }
     // commit changes
